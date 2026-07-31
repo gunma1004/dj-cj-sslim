@@ -14,7 +14,8 @@ export async function generateMetadata({
   if (!cityInfo || !districtInfo) return {};
 
   const title = `${cityInfo.name} ${districtInfo.name} 출장마사지 | 24시 방문 힐링케어`;
-  const description = `${cityInfo.name} ${districtInfo.name} 출장마사지 24시 방문. ${districtInfo.name} 전 지역 30분 내 도착, 건식·아로마·VIP스웨디시 선입금 없는 100% 후불제.`;
+  // 👇 80자 이내로 문구 가듬기 (약 62자)
+  const description = `${cityInfo.name} ${districtInfo.name} 24시 출장마사지 전문. ${districtInfo.name} 전 지역 30분 내 신속 방문, 건식·아로마·스웨디시 100% 후불제.`;
   const url = `${DOMAIN}/${city}/${district}`;
 
   return {
