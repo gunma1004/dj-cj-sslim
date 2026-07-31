@@ -13,11 +13,23 @@ export async function generateMetadata({
 
   if (!cityInfo || !districtInfo) return {};
 
+  const title = `${cityInfo.name} ${districtInfo.name} 출장마사지 | 24시 방문 힐링케어`;
+  const description = `${cityInfo.name} ${districtInfo.name} 출장마사지 24시 방문. ${districtInfo.name} 전 지역 30분 내 도착, 건식·아로마·VIP스웨디시 선입금 없는 100% 후불제.`;
+  const url = `${DOMAIN}/${city}/${district}`;
+
   return {
-    title: `${cityInfo.name} ${districtInfo.name} 출장마사지 | 24시 방문 힐링케어`,
-    description: `${cityInfo.name} ${districtInfo.name} 출장마사지 24시 방문. ${districtInfo.name} 전 지역 30분 내 도착, 건식·아로마·VIP스웨디시 선입금 없는 100% 후불제.`,
+    title: title,
+    description: description,
     alternates: {
-      canonical: `${DOMAIN}/${city}/${district}`,
+      canonical: url,
+    },
+    openGraph: {
+      title: title,
+      description: description,
+      url: url,
+      siteName: `${cityInfo.name} 출장마사지`,
+      locale: "ko_KR",
+      type: "website",
     },
   };
 }

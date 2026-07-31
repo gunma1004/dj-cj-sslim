@@ -14,11 +14,23 @@ export async function generateMetadata({
 
   if (!cityInfo || !districtInfo || !dongInfo) return {};
 
+  const title = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name} 출장마사지 | 24시 방문`;
+  const description = `${cityInfo.name} ${dongInfo.name} 출장마사지 24시 신속 방문. ${dongInfo.name} 어디든 20~30분 이내 도착, 건식·아로마·VIP스웨디시 선입금 없는 100% 후불제.`;
+  const url = `${DOMAIN}/${city}/${district}/${dong}`;
+
   return {
-    title: `${cityInfo.name} ${districtInfo.name} ${dongInfo.name} 출장마사지 | 24시 방문`,
-    description: `${cityInfo.name} ${dongInfo.name} 출장마사지 24시 신속 방문. ${dongInfo.name} 어디든 20~30분 이내 도착, 건식·아로마·VIP스웨디시 선입금 없는 100% 후불제.`,
+    title: title,
+    description: description,
     alternates: {
-      canonical: `${DOMAIN}/${city}/${district}/${dong}`,
+      canonical: url,
+    },
+    openGraph: {
+      title: title,
+      description: description,
+      url: url,
+      siteName: `${cityInfo.name} 출장마사지`,
+      locale: "ko_KR",
+      type: "website",
     },
   };
 }
