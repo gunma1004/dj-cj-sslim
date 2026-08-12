@@ -1,7 +1,30 @@
 import Link from "next/link";
-import { CITIES_DATA, DOMAIN } from "@/app/data";
+import Image from "next/image";
 import { notFound } from "next/navigation";
+import { CITIES_DATA, DOMAIN } from "@/app/data";
 
+// 🎯 1. 동 정적 페이지 생성 함수 (SSG 빌드용)
+export async function generateStaticParams() {
+  const paths: { city: string; district: string; dong: string }[] = [];
+
+  Object.values(CITIES_DATA).forEach((city) => {
+    city.districts.forEach((district) => {
+      district.dongs.forEach((dong) => {
+        paths.push({
+          city: city.slug,
+          district: district.slug,
+          dong: dong.slug,
+        });
+      });
+    });
+  });
+
+  return paths;
+}
+
+export const dynamicParams = false;
+
+// 🎯 2. 동별 고유 SEO 메타데이터 생성 함수
 export async function generateMetadata({
   params,
 }: {
@@ -14,20 +37,19 @@ export async function generateMetadata({
 
   if (!cityInfo || !districtInfo || !dongInfo) return {};
 
-  const title = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name} 출장마사지 | 24시 방문`;
-  const description = `${cityInfo.name} ${dongInfo.name} 출장마사지 24시 신속 방문. ${dongInfo.name} 어디든 20~30분 이내 도착, 건식·아로마·VIP스웨디시 선입금 없는 100% 후불제.`;
+  // data.ts의 동별 고유 타이틀 및 설명 사용
+  const title = dongInfo.seoTitle;
+  const description = dongInfo.seoDesc;
   const url = `${DOMAIN}/${city}/${district}/${dong}`;
 
   return {
-    title: title,
-    description: description,
-    alternates: {
-      canonical: url,
-    },
+    title,
+    description,
+    alternates: { canonical: url },
     openGraph: {
-      title: title,
-      description: description,
-      url: url,
+      title,
+      description,
+      url,
       siteName: `${cityInfo.name} 출장마사지`,
       locale: "ko_KR",
       type: "website",
@@ -35,6 +57,7 @@ export async function generateMetadata({
   };
 }
 
+// 🎯 3. 동 페이지 본문 컴포넌트
 export default async function DongPage({
   params,
 }: {
@@ -55,18 +78,22 @@ export default async function DongPage({
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
-      {/* 상단바 */}
+      {/* 상단바 (GNB 로고 적용) */}
       <header className="sticky top-0 z-40 bg-[#080611]/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1160px] mx-auto h-[66px] px-4 flex items-center justify-between">
-          <Link
-            href={`/${city}/${district}`}
-            className="font-extrabold text-sm sm:text-base text-gray-300 hover:text-white"
-          >
-            ← {districtInfo.name} 전체보기
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/images/logo.png"
+              alt="대전 청주 출장마사지"
+              width={300}
+              height={80}
+              className="h-8 sm:h-10 w-auto object-contain"
+              priority
+            />
           </Link>
           <a
             href={`tel:${cityInfo.phone}`}
-            className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black"
+            className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black transition-transform hover:scale-105"
             style={{ backgroundColor: mainColor }}
           >
             📞 {cityInfo.name}지역담당 문의
@@ -75,6 +102,15 @@ export default async function DongPage({
       </header>
 
       <main className="py-12 px-4 max-w-[900px] mx-auto text-center">
+        {/* Breadcrumb 경로 안내 */}
+        <nav className="text-xs text-gray-400 space-x-2 text-left mb-6">
+          <Link href="/" className="hover:underline">홈</Link> &gt; 
+          <Link href={`/${city}/${district}`} className="hover:underline">
+            {cityInfo.name} {districtInfo.name}
+          </Link> &gt; 
+          <span className="text-white font-bold">{dongInfo.name}</span>
+        </nav>
+
         <span
           className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
           style={{
@@ -83,14 +119,15 @@ export default async function DongPage({
             backgroundColor: `${mainColor}15`,
           }}
         >
-          {cityInfo.name} {dongInfo.name} 맞춤 방문 케어
+          {cityInfo.name} {dongInfo.name} 24H CARE
         </span>
-        <h1 className="text-3xl sm:text-5xl font-black mb-4">
-          {cityInfo.name} {dongInfo.name} 출장마사지
+
+        {/* 🎯 동별 고유 H1 제목 및 본문 내용 적용 */}
+        <h1 className="text-2xl sm:text-4xl font-black mb-4 leading-tight">
+          {dongInfo.contentHeading}
         </h1>
-        <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[650px] mx-auto leading-relaxed">
-          {dongInfo.name} 전 지역 어디든 계신 곳으로 20~30분 이내 출발합니다. <br />
-          선입금 없는 100% 후불제로 안심하고 편안하게 관리받으세요.
+        <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[700px] mx-auto leading-relaxed">
+          {dongInfo.contentBody}
         </p>
 
         {/* 상세 안내 정보 카드 */}
@@ -127,7 +164,7 @@ export default async function DongPage({
               <tbody className="divide-y divide-white/10 text-sm">
                 <tr>
                   <th className="py-4 px-4 font-extrabold text-left sm:text-center text-white">건식 마사지</th>
-                  <td className="py-4 px-3 font-bold">70,000원</td>
+                  <td className="py-4 px-3 font-bold">60,000원</td>
                   <td className="py-4 px-3 font-bold">70,000원</td>
                   <td className="py-4 px-3 font-bold">80,000원</td>
                 </tr>
@@ -158,14 +195,14 @@ export default async function DongPage({
         <div className="grid grid-cols-2 gap-3 max-w-[480px] mx-auto">
           <a
             href={`tel:${cityInfo.phone}`}
-            className="py-4 rounded-2xl font-black text-black text-base shadow-lg"
+            className="py-4 rounded-2xl font-black text-black text-base shadow-lg hover:scale-105 transition-all"
             style={{ backgroundColor: mainColor }}
           >
             📞 {dongInfo.name} 전화예약
           </a>
           <a
             href={`sms:${cityInfo.phone}`}
-            className="py-4 rounded-2xl bg-white text-black font-black text-base shadow-lg"
+            className="py-4 rounded-2xl bg-white text-black font-black text-base shadow-lg hover:scale-105 transition-all"
           >
             💬 {dongInfo.name} 문자문의
           </a>
@@ -176,7 +213,7 @@ export default async function DongPage({
       <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-20px)] max-w-[500px] bg-[#080611]/95 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-2xl z-50">
         <a
           href={`tel:${cityInfo.phone}`}
-          className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1"
+          className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1 active:scale-95 transition-all"
           style={{ backgroundColor: mainColor }}
         >
           📞 {dongInfo.name} 전화 연결하기 ({cityInfo.phone.slice(-4)})

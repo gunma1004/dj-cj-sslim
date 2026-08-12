@@ -1,9 +1,9 @@
 import Link from "next/link";
+import Image from "next/image"; // 👈 필수 임포트 추가!
 import { CITIES_DATA, DOMAIN } from "@/app/data";
 
 export const metadata = {
   title: "대전 출장마사지 & 청주 출장마사지 | 24시 방문 힐링케어",
-  // 👇 80자 이내로 수정
   description:
     "대전 및 청주 전 지역 24시 출장마사지 전문. 유성구·서구·흥덕구·청원구 30분 내 방문, 스웨디시·아로마 100% 후불제.",
   alternates: {
@@ -11,7 +11,6 @@ export const metadata = {
   },
   openGraph: {
     title: "대전 출장마사지 & 청주 출장마사지 | 24시 방문 힐링케어",
-    // 👇 80자 이내로 수정
     description:
       "대전 및 청주 전 지역 24시 출장마사지 전문. 유성구·서구·흥덕구·청원구 30분 내 방문, 스웨디시·아로마 100% 후불제.",
     url: DOMAIN,
@@ -37,7 +36,6 @@ export default function HomePage() {
     )
   );
 
-  /* JSON-LD 내 전화번호(telephone) 항목 완전히 제외 */
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -62,8 +60,8 @@ export default function HomePage() {
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
-      {/* 네이버 수집용 숨김 캐러셀 DOM */}
-      <div className="naver-carousel-dom" aria-hidden="true">
+      {/* 네이버 수집용 숨김 캐러셀 DOM (sr-only 추가) */}
+      <div className="naver-carousel-dom sr-only" aria-hidden="true">
         <ul>
           {allLinks.map((item, idx) => (
             <li key={idx}>
@@ -77,16 +75,24 @@ export default function HomePage() {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
 
       {/* GNB (상단바) */}
       <header className="sticky top-0 z-40 bg-[#080611]/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1160px] mx-auto h-[66px] px-4 flex items-center justify-between">
-          <Link href="/" className="font-black text-sm sm:text-xl tracking-tight text-white flex items-center gap-1.5">
-            <span className="text-[#00ff88]">대전 출장마사지</span>
-            <span className="text-gray-500 font-normal text-xs">|</span>
-            <span className="text-[#ba8cff]">청주 출장마사지</span>
+          {/* 🎯 로고 적용 완료 */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/images/logo.png"
+              alt="대전 청주 출장마사지"
+              width={300}
+              height={80}
+              className="h-8 sm:h-10 w-auto object-contain"
+              priority
+            />
           </Link>
           <div className="flex gap-1.5 sm:gap-2">
             <a
@@ -307,7 +313,7 @@ export default function HomePage() {
                     건식 마사지
                     <span className="block text-xs font-normal text-gray-400">전신 스트레칭 중심</span>
                   </th>
-                  <td className="py-4 px-3 text-gray-200 font-bold">70,000원</td>
+                  <td className="py-4 px-3 text-gray-200 font-bold">60,000원</td> {/* 60분 수정 */}
                   <td className="py-4 px-3 text-gray-200 font-bold">70,000원</td>
                   <td className="py-4 px-3 text-gray-200 font-bold">80,000원</td>
                 </tr>

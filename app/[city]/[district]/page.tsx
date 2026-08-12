@@ -1,22 +1,41 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CITIES_DATA, DOMAIN } from "@/app/data";
 import { notFound } from "next/navigation";
 
+// 1. 빌드 타임에 정적 생성할 [city]/[district] 경로 목록 등록 (SSG)
+export async function generateStaticParams() {
+  const paths: { city: string; district: string }[] = [];
+
+  Object.values(CITIES_DATA).forEach((city) => {
+    city.districts.forEach((district) => {
+      paths.push({
+        city: city.slug,
+        district: district.slug,
+      });
+    });
+  });
+
+  return paths;
+}
+
+export const dynamicParams = false;
+
+// 2. 구별 메타데이터 생성 (SEO)
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ city: string; district: string }>;
 }) {
-  const { city, district } = await params;
-  const cityInfo = CITIES_DATA[city];
-  const districtInfo = cityInfo?.districts.find((d) => d.slug === district);
+  const { city: citySlug, district: districtSlug } = await params;
+  const cityInfo = CITIES_DATA[citySlug];
+  const districtInfo = cityInfo?.districts.find((d) => d.slug === districtSlug);
 
   if (!cityInfo || !districtInfo) return {};
 
   const title = `${cityInfo.name} ${districtInfo.name} 출장마사지 | 24시 방문 힐링케어`;
-  // 👇 80자 이내로 문구 가듬기 (약 62자)
   const description = `${cityInfo.name} ${districtInfo.name} 24시 출장마사지 전문. ${districtInfo.name} 전 지역 30분 내 신속 방문, 건식·아로마·스웨디시 100% 후불제.`;
-  const url = `${DOMAIN}/${city}/${district}`;
+  const url = `${DOMAIN}/${citySlug}/${districtSlug}`;
 
   return {
     title: title,
@@ -35,29 +54,30 @@ export async function generateMetadata({
   };
 }
 
+// 3. 구 페이지 본문 컴포넌트
 export default async function DistrictPage({
   params,
 }: {
   params: Promise<{ city: string; district: string }>;
 }) {
-  const { city, district } = await params;
-  const cityInfo = CITIES_DATA[city];
+  const { city: citySlug, district: districtSlug } = await params;
+  const cityInfo = CITIES_DATA[citySlug];
   if (!cityInfo) return notFound();
 
-  const districtInfo = cityInfo.districts.find((d) => d.slug === district);
+  const districtInfo = cityInfo.districts.find((d) => d.slug === districtSlug);
   if (!districtInfo) return notFound();
 
-  const isDaejeon = city === "daejeon";
+  const isDaejeon = citySlug === "daejeon";
   const mainColor = isDaejeon ? "#00ff88" : "#ba8cff";
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
       {/* 네이버 수집용 우회 DOM */}
-      <div className="naver-carousel-dom" aria-hidden="true">
+      <div className="naver-carousel-dom sr-only" aria-hidden="true">
         <ul>
           {districtInfo.dongs.map((dong) => (
             <li key={dong.slug}>
-              <a href={`/${city}/${district}/${dong.slug}`}>
+              <a href={`/${citySlug}/${districtSlug}/${dong.slug}`}>
                 <strong>
                   {cityInfo.name} {districtInfo.name} {dong.name} 출장마사지
                 </strong>
@@ -70,12 +90,19 @@ export default async function DistrictPage({
       {/* 헤더 */}
       <header className="sticky top-0 z-40 bg-[#080611]/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1160px] mx-auto h-[66px] px-4 flex items-center justify-between">
-          <Link href="/" className="font-extrabold text-sm sm:text-base text-gray-300 hover:text-white">
-            ← 전체 메인으로
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/images/logo.png"
+              alt="대전 청주 출장마사지"
+              width={300}
+              height={80}
+              className="h-8 sm:h-10 w-auto object-contain"
+              priority
+            />
           </Link>
           <a
             href={`tel:${cityInfo.phone}`}
-            className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black"
+            className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black transition-transform hover:scale-105"
             style={{ backgroundColor: mainColor }}
           >
             📞 {cityInfo.name}지역담당 문의
@@ -84,6 +111,12 @@ export default async function DistrictPage({
       </header>
 
       <main className="py-12 px-4 max-w-[900px] mx-auto text-center">
+        {/* 구 페이지용 빵부순(Breadcrumb) */}
+        <nav className="text-xs text-gray-400 space-x-2 text-left mb-6">
+          <Link href="/" className="hover:underline">홈</Link> &gt; 
+          <span className="text-white font-bold">{cityInfo.name} {districtInfo.name}</span>
+        </nav>
+
         <span
           className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
           style={{
@@ -111,7 +144,7 @@ export default async function DistrictPage({
             {districtInfo.dongs.map((dong) => (
               <Link
                 key={dong.slug}
-                href={`/${city}/${district}/${dong.slug}`}
+                href={`/${citySlug}/${districtSlug}/${dong.slug}`}
                 className="p-4 rounded-2xl bg-[#140f24] border border-white/10 hover:border-[#00ff88] transition-all text-center block group"
               >
                 <span className="text-base font-bold text-white block mb-1 group-hover:text-[#00ff88]">
@@ -144,7 +177,7 @@ export default async function DistrictPage({
               <tbody className="divide-y divide-white/10 text-sm">
                 <tr>
                   <th className="py-4 px-4 font-extrabold text-left sm:text-center text-white">건식 마사지</th>
-                  <td className="py-4 px-3 font-bold">70,000원</td>
+                  <td className="py-4 px-3 font-bold">60,000원</td>
                   <td className="py-4 px-3 font-bold">70,000원</td>
                   <td className="py-4 px-3 font-bold">80,000원</td>
                 </tr>
@@ -175,14 +208,14 @@ export default async function DistrictPage({
         <div className="grid grid-cols-2 gap-3 max-w-[480px] mx-auto">
           <a
             href={`tel:${cityInfo.phone}`}
-            className="py-4 rounded-2xl font-black text-black text-base shadow-lg"
+            className="py-4 rounded-2xl font-black text-black text-base shadow-lg hover:scale-105 transition-all"
             style={{ backgroundColor: mainColor }}
           >
             📞 {districtInfo.name} 전화하기
           </a>
           <a
             href={`sms:${cityInfo.phone}`}
-            className="py-4 rounded-2xl bg-white text-black font-black text-base shadow-lg"
+            className="py-4 rounded-2xl bg-white text-black font-black text-base shadow-lg hover:scale-105 transition-all"
           >
             💬 {districtInfo.name} 문자하기
           </a>
@@ -193,7 +226,7 @@ export default async function DistrictPage({
       <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-20px)] max-w-[500px] bg-[#080611]/95 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-2xl z-50">
         <a
           href={`tel:${cityInfo.phone}`}
-          className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1"
+          className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1 active:scale-95 transition-all"
           style={{ backgroundColor: mainColor }}
         >
           📞 {cityInfo.name}지역담당 바로연결 ({cityInfo.phone.slice(-4)})

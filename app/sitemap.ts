@@ -11,8 +11,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // CITIES_DATA의 모든 구 및 동 경로 자동 추출
   Object.values(CITIES_DATA).forEach((city) => {
+    // 🎯 (선택 추가) '시' 페이지 URL 추가 (/daejeon, /cheongju)
+    routes.push({
+      url: `${DOMAIN}/${city.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    });
+
     city.districts.forEach((district) => {
       // '구' 페이지 URL 추가
       routes.push({
