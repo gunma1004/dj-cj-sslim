@@ -29,10 +29,15 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* 네이버 서치어드바이저 소유확인 태그 직접 삽입 */}
+        {/* 🎯 구글 서치콘솔 소유확인 태그 */}
+        <meta
+          name="google-site-verification"
+          content="LA_pPxDDG8woTpUkC-go8lX1KK6GvlR9z0izx4KkUMM"
+        />
+        {/* 🎯 네이버 서치어드바이저 소유확인 태그 */}
         <meta
           name="naver-site-verification"
-          content="93619e854ae0d429d3dab505e6a4ff1679eb4832"
+          content="57a5a96e71ce6d64d06f09340b6f4ee2d481a055"
         />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
