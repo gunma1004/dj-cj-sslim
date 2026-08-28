@@ -13,9 +13,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dj-cj-touchon.netlify.app"),
   title: "대전 출장마사지 & 청주 출장마사지 | 24시 방문 힐링케어",
   description:
     "대전 및 청주 전 지역 24시 출장마사지 전문. 대전 유성구, 서구, 청주 흥덕구, 청원구 30분 내 빠른 방문, 건식·아로마·스페셜·VIP스웨디시 후불제 안내.",
+  alternates: {
+    canonical: "https://dj-cj-touchon.netlify.app",
+  },
+  openGraph: {
+    title: "대전 출장마사지 & 청주 출장마사지 | 24시 방문 힐링케어",
+    description:
+      "대전 및 청주 전 지역 24시 출장마사지 전문. 대전 유성구, 서구, 청주 흥덕구, 청원구 30분 내 빠른 방문.",
+    url: "https://dj-cj-touchon.netlify.app",
+    siteName: "대전·청주 터치온 출장마사지",
+    locale: "ko_KR",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  verification: {
+    google: "LA_pPxDDG8woTpUkC-go8lX1KK6GvlR9z0izx4KkUMM",
+    other: {
+      "naver-site-verification": "57a5a96e71ce6d64d06f09340b6f4ee2d481a055",
+    },
+  },
 };
 
 export default function RootLayout({
@@ -28,18 +51,6 @@ export default function RootLayout({
       lang="ko"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        {/* 🎯 구글 서치콘솔 소유확인 태그 */}
-        <meta
-          name="google-site-verification"
-          content="LA_pPxDDG8woTpUkC-go8lX1KK6GvlR9z0izx4KkUMM"
-        />
-        {/* 🎯 네이버 서치어드바이저 소유확인 태그 */}
-        <meta
-          name="naver-site-verification"
-          content="57a5a96e71ce6d64d06f09340b6f4ee2d481a055"
-        />
-      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
