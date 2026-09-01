@@ -21,7 +21,7 @@ export interface CityData {
   districts: DistrictData[];
 }
 
-export const DOMAIN = "https://dj-cj-touchon.netlify.app";
+export const DOMAIN = "https://dj-cj-sslim.netlify.app";
 export const BRAND_NAME = "S슬림";
 
 export const CITIES_DATA: Record<string, CityData> = {
