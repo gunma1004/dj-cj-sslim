@@ -110,29 +110,6 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ─── 🖼️ 메인 배너 영역 (추가됨) ─── */}
-      <section className="relative w-full max-w-[1160px] mx-auto mt-4 px-4">
-        <div className="relative w-full h-[220px] sm:h-[320px] md:h-[400px] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-          <Image
-            src="/main-banner.jpg"
-            alt={`${BRAND_NAME} 프리미엄 메인 배너`}
-            fill
-            priority
-            className="object-cover object-center"
-          />
-          {/* 배너 위 은은한 텍스트 및 그라디언트 오버레이 */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#080611] via-black/30 to-transparent flex flex-col justify-end p-6 sm:p-8">
-            <span className="inline-block w-fit px-3 py-1 rounded-full bg-[#ba8cff]/20 text-[#ba8cff] border border-[#ba8cff]/40 font-bold text-[11px] sm:text-xs mb-2">
-              PREMIUM HOME RELAXING
-            </span>
-            <h2 className="text-xl sm:text-3xl font-black text-white leading-tight">
-              지친 하루의 완벽한 힐링, <br />
-              <span className="text-[#00ff88]">S슬림</span>이 함께합니다.
-            </h2>
-          </div>
-        </div>
-      </section>
-
       {/* 히어로 섹션 */}
       <section className="py-12 px-4 max-w-[900px] mx-auto text-center">
         <span className="inline-block px-3.5 py-1 rounded-full bg-[#ba8cff]/15 text-[#ba8cff] border border-[#ba8cff]/30 font-black text-xs mb-3">
@@ -387,7 +364,7 @@ export default function HomePage() {
                   <span className="text-lg">🔮</span>
                   <h3 className="text-lg font-black text-white">스폐셜 코스</h3>
                 </div>
-                <span className="text-xs text-yellow-400 font-bold bg-yellow-400/10 px-2.5 py-1 rounded-full border border-yellow-400/30">복합 집중 케어</span>
+                <span className="text-yellow-400 font-bold bg-yellow-400/10 px-2.5 py-1 rounded-full border border-yellow-400/30 text-xs">복합 집중 케어</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs sm:text-sm">
                 <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex flex-col justify-between">
@@ -421,7 +398,7 @@ export default function HomePage() {
                   <span className="text-lg">🔮</span>
                   <h3 className="text-lg font-black text-white">힐링 코스</h3>
                 </div>
-                <span className="text-xs text-sky-400 font-bold bg-sky-400/10 px-2.5 py-1 rounded-full border border-sky-400/30">심신 딥 릴렉스</span>
+                <span className="text-sky-400 font-bold bg-sky-400/10 px-2.5 py-1 rounded-full border border-sky-400/30 text-xs">심신 딥 릴렉스</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs sm:text-sm">
                 <div className="p-2.5 rounded-xl bg-white/5 border border-white/5">
@@ -450,7 +427,7 @@ export default function HomePage() {
                   <span className="text-lg">🔮</span>
                   <h3 className="text-lg font-black text-[#ba8cff]">VIP 스웨디시</h3>
                 </div>
-                <span className="text-xs text-black bg-[#ba8cff] font-black px-2.5 py-0.5 rounded-full">최상급 림프 케어</span>
+                <span className="text-black bg-[#ba8cff] font-black px-2.5 py-0.5 rounded-full text-xs">최상급 림프 케어</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center text-xs sm:text-sm">
                 <div className="p-2.5 rounded-xl bg-white/5 border border-white/10">
