@@ -110,6 +110,29 @@ export default function HomePage() {
         </div>
       </header>
 
+      {/* ─── 🖼️ 메인 배너 영역 (추가됨) ─── */}
+      <section className="relative w-full max-w-[1160px] mx-auto mt-4 px-4">
+        <div className="relative w-full h-[220px] sm:h-[320px] md:h-[400px] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+          <Image
+            src="/main-banner.jpg"
+            alt={`${BRAND_NAME} 프리미엄 메인 배너`}
+            fill
+            priority
+            className="object-cover object-center"
+          />
+          {/* 배너 위 은은한 텍스트 및 그라디언트 오버레이 */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#080611] via-black/30 to-transparent flex flex-col justify-end p-6 sm:p-8">
+            <span className="inline-block w-fit px-3 py-1 rounded-full bg-[#ba8cff]/20 text-[#ba8cff] border border-[#ba8cff]/40 font-bold text-[11px] sm:text-xs mb-2">
+              PREMIUM HOME RELAXING
+            </span>
+            <h2 className="text-xl sm:text-3xl font-black text-white leading-tight">
+              지친 하루의 완벽한 힐링, <br />
+              <span className="text-[#00ff88]">S슬림</span>이 함께합니다.
+            </h2>
+          </div>
+        </div>
+      </section>
+
       {/* 히어로 섹션 */}
       <section className="py-12 px-4 max-w-[900px] mx-auto text-center">
         <span className="inline-block px-3.5 py-1 rounded-full bg-[#ba8cff]/15 text-[#ba8cff] border border-[#ba8cff]/30 font-black text-xs mb-3">
@@ -196,7 +219,7 @@ export default function HomePage() {
       </section>
 
       <main className="max-w-[960px] mx-auto px-4 mt-12 space-y-16">
-        {/* 지역 선택 카테고리 (대전/청주 시 페이지 링크 추가 완료) */}
+        {/* 지역 선택 카테고리 */}
         <section id="area">
           <div className="text-center mb-8">
             <p className="text-[#ba8cff] font-extrabold text-xs tracking-widest mb-1">LOCATION</p>
@@ -299,7 +322,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 💌 코스 및 요금 안내 (신규 코스표 반영 완료) */}
+        {/* 💌 코스 및 요금 안내 */}
         <section id="course">
           <div className="text-center mb-8">
             <p className="text-[#ba8cff] font-extrabold text-xs tracking-widest mb-1">COURSE & PRICE</p>
