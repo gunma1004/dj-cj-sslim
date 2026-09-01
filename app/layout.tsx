@@ -15,20 +15,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://dj-cj-touchon.netlify.app"),
   title: {
-    template: "%s | 터치온 프리미엄 홈 테라피",
-    default: "터치온 | 대전·청주 1:1 맞춤 프리미엄 홈 테라피 & 바디 릴렉싱",
+    template: "%s | S슬림 프리미엄 홈 테라피",
+    default: "S슬림 | 대전·청주 1:1 맞춤 프리미엄 홈 바디 테라피 & 릴렉싱",
   },
   description:
-    "대전 및 청주 전 지역 프라이빗 방문 테라피 안내. 유성구, 서구, 흥덕구, 청원구 등 1:1 맞춤 아로마, 바디 컨디셔닝, 힐링 릴렉스 케어 예약 가이드.",
+    "대전 및 청주 전 지역 프라이빗 방문 바디케어 안내. 유성구, 서구, 중구, 흥덕구, 청원구 1:1 맞춤 타이, 아로마, 스웨디시 힐링 릴렉스 예약 가이드.",
   alternates: {
     canonical: "https://dj-cj-touchon.netlify.app",
   },
   openGraph: {
-    title: "터치온 | 대전·청주 1:1 맞춤 프리미엄 홈 테라피",
+    title: "S슬림 | 대전·청주 1:1 맞춤 프리미엄 홈 테라피",
     description:
       "대전·청주 전 지역 프라이빗 방문 힐링 케어 및 바디 컨디셔닝 서비스 안내.",
     url: "https://dj-cj-touchon.netlify.app",
-    siteName: "터치온 (Touch On)",
+    siteName: "S슬림 (S-Slim)",
     locale: "ko_KR",
     type: "website",
   },
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   verification: {
     google: "LA_pPxDDG8woTpUkC-go8lX1KK6GvlR9z0izx4KkUMM",
     other: {
-      "naver-site-verification": "57a5a96e71ce6d64d06f09340b6f4ee2d481a055",
+      "naver-site-verification": "82adf43836ecf406bc29b138d2ebacb1e096c8e4",
     },
   },
 };
