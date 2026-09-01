@@ -1,17 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
+import { CITIES_DATA, DOMAIN, BRAND_NAME, getKeywordModifier } from "@/app/data";
 import { notFound } from "next/navigation";
-import { CITIES_DATA, DOMAIN } from "@/app/data";
 
-// 🎯 1. 동 정적 페이지 생성 함수 (SSG 빌드용)
 export async function generateStaticParams() {
   const paths: { city: string; district: string; dong: string }[] = [];
 
-  Object.values(CITIES_DATA).forEach((city) => {
+  Object.entries(CITIES_DATA).forEach(([citySlug, city]) => {
     city.districts.forEach((district) => {
       district.dongs.forEach((dong) => {
         paths.push({
-          city: city.slug,
+          city: citySlug,
           district: district.slug,
           dong: dong.slug,
         });
@@ -24,7 +23,7 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false;
 
-// 🎯 2. 동별 고유 SEO 메타데이터 생성 함수
+// 동 단위 메타데이터 (동별 고유 회피 키워드 부여)
 export async function generateMetadata({
   params,
 }: {
@@ -37,9 +36,11 @@ export async function generateMetadata({
 
   if (!cityInfo || !districtInfo || !dongInfo) return {};
 
-  // data.ts의 동별 고유 타이틀 및 설명 사용
-  const title = dongInfo.seoTitle;
-  const description = dongInfo.seoDesc;
+  const areaFullName = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name}`;
+  const modifier = getKeywordModifier(areaFullName);
+
+  const title = `${dongInfo.name} 출장 ${modifier.prefix} 마사지 | ${BRAND_NAME} ${cityInfo.name}`;
+  const description = `${areaFullName} 24시간 출장 ${modifier.prefix} 마사지 전문. ${modifier.sub}. 30분 내 빠른 도착, 선입금 없는 100% 현장 후불제.`;
   const url = `${DOMAIN}/${city}/${district}/${dong}`;
 
   return {
@@ -50,14 +51,13 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: `${cityInfo.name} 출장마사지`,
+      siteName: `${BRAND_NAME} ${dongInfo.name}`,
       locale: "ko_KR",
       type: "website",
     },
   };
 }
 
-// 🎯 3. 동 페이지 본문 컴포넌트
 export default async function DongPage({
   params,
 }: {
@@ -65,26 +65,25 @@ export default async function DongPage({
 }) {
   const { city, district, dong } = await params;
   const cityInfo = CITIES_DATA[city];
-  if (!cityInfo) return notFound();
+  const districtInfo = cityInfo?.districts.find((d) => d.slug === district);
+  const dongInfo = districtInfo?.dongs.find((d) => d.slug === dong);
 
-  const districtInfo = cityInfo.districts.find((d) => d.slug === district);
-  if (!districtInfo) return notFound();
-
-  const dongInfo = districtInfo.dongs.find((d) => d.slug === dong);
-  if (!dongInfo) return notFound();
+  if (!cityInfo || !districtInfo || !dongInfo) return notFound();
 
   const isDaejeon = city === "daejeon";
   const mainColor = isDaejeon ? "#00ff88" : "#ba8cff";
+  const areaFullName = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name}`;
+  const modifier = getKeywordModifier(areaFullName);
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
-      {/* 상단바 (GNB 로고 적용) */}
+      {/* GNB */}
       <header className="sticky top-0 z-40 bg-[#080611]/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1160px] mx-auto h-[66px] px-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/images/logo.png"
-              alt="대전 청주 출장마사지"
+              alt={`${BRAND_NAME} 홈케어`}
               width={300}
               height={80}
               className="h-8 sm:h-10 w-auto object-contain"
@@ -96,21 +95,12 @@ export default async function DongPage({
             className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black transition-transform hover:scale-105"
             style={{ backgroundColor: mainColor }}
           >
-            📞 {cityInfo.name}지역담당 문의
+            📞 {dongInfo.name} 상담 연결
           </a>
         </div>
       </header>
 
       <main className="py-12 px-4 max-w-[900px] mx-auto text-center">
-        {/* Breadcrumb 경로 안내 */}
-        <nav className="text-xs text-gray-400 space-x-2 text-left mb-6">
-          <Link href="/" className="hover:underline">홈</Link> &gt; 
-          <Link href={`/${city}/${district}`} className="hover:underline">
-            {cityInfo.name} {districtInfo.name}
-          </Link> &gt; 
-          <span className="text-white font-bold">{dongInfo.name}</span>
-        </nav>
-
         <span
           className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
           style={{
@@ -119,104 +109,69 @@ export default async function DongPage({
             backgroundColor: `${mainColor}15`,
           }}
         >
-          {cityInfo.name} {dongInfo.name} 24H CARE
+          {areaFullName} 24H CARE
         </span>
 
-        {/* 🎯 동별 고유 H1 제목 및 본문 내용 적용 */}
-        <h1 className="text-2xl sm:text-4xl font-black mb-4 leading-tight">
-          {dongInfo.contentHeading}
+        {/* H1: 동별 고유 회피 키워드 */}
+        <h1 className="text-3xl sm:text-5xl font-black mb-4">
+          {dongInfo.name} 출장 {modifier.prefix} 마사지
         </h1>
-        <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[700px] mx-auto leading-relaxed">
-          {dongInfo.contentBody}
+        <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[650px] mx-auto leading-relaxed">
+          {areaFullName} 30분 이내 방문! {modifier.sub} <br />
+          선입금 요구 없는 100% 안전 현장 후불제로 안심하고 이용하세요.
         </p>
 
-        {/* 상세 안내 정보 카드 */}
-        <section className="p-6 rounded-3xl bg-[#140f24] border border-white/15 text-left mb-10 max-w-[600px] mx-auto space-y-3">
-          <h2 className="text-lg font-black" style={{ color: mainColor }}>
-            📍 {dongInfo.name} 서비스 안내
-          </h2>
-          <ul className="text-sm text-gray-200 space-y-2 leading-relaxed">
-            <li>• <strong>방문 가능 지역:</strong> {dongInfo.name} 전 지역 (자택, 오피스텔, 호텔 등)</li>
-            <li>• <strong>평균 도착 시간:</strong> 예약 확인 후 20~30분 이내</li>
-            <li>• <strong>결제 방식:</strong> 선입금 없는 100% 현장 후불제</li>
-            <li>• <strong>운영 시간:</strong> 24시간 365일 연중무휴</li>
-          </ul>
-        </section>
+        {/* 케어 코스 안내 */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left mb-12">
+          <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
+            <span className="text-xs font-bold text-gray-400">PROGRAM 01</span>
+            <h3 className="font-extrabold text-white text-base">출장 타이 마사지</h3>
+            <p className="text-xs text-gray-300">뭉친 근육을 부드럽게 풀어주는 스트레칭 중심 케어</p>
+          </div>
+          <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
+            <span className="text-xs font-bold text-gray-400">PROGRAM 02</span>
+            <h3 className="font-extrabold text-white text-base">출장 아로마 마사지</h3>
+            <p className="text-xs text-gray-300">천연 아로마 오일로 심신 안정 및 피로 해소</p>
+          </div>
+          <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
+            <span className="text-xs font-bold text-gray-400">PROGRAM 03</span>
+            <h3 className="font-extrabold text-white text-base">출장 힐링 스웨디시</h3>
+            <p className="text-xs text-gray-300">부드러운 터치와 림프 순환을 돕는 프리미엄 케어</p>
+          </div>
+        </div>
 
-        {/* 요금 표 */}
-        <section className="mb-12">
-          <h2 className="text-xl font-bold mb-4 text-left text-gray-300">
-            💳 {dongInfo.name} 코스 및 요금
-          </h2>
-          <div className="overflow-x-auto rounded-3xl border border-white/15 bg-[#140f24] shadow-2xl">
-            <table className="w-full text-center border-collapse">
-              <thead>
-                <tr
-                  className="text-black font-black text-sm"
-                  style={{ backgroundColor: mainColor }}
-                >
-                  <th className="py-4 px-4">코스</th>
-                  <th className="py-4 px-3">60분</th>
-                  <th className="py-4 px-3">90분</th>
-                  <th className="py-4 px-3">120분</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/10 text-sm">
-                <tr>
-                  <th className="py-4 px-4 font-extrabold text-left sm:text-center text-white">건식 마사지</th>
-                  <td className="py-4 px-3 font-bold">60,000원</td>
-                  <td className="py-4 px-3 font-bold">70,000원</td>
-                  <td className="py-4 px-3 font-bold">80,000원</td>
-                </tr>
-                <tr>
-                  <th className="py-4 px-4 font-extrabold text-left sm:text-center text-white">아로마 마사지</th>
-                  <td className="py-4 px-3 font-bold">60,000원</td>
-                  <td className="py-4 px-3 font-bold">80,000원</td>
-                  <td className="py-4 px-3 font-bold">90,000원</td>
-                </tr>
-                <tr>
-                  <th className="py-4 px-4 font-extrabold text-left sm:text-center text-white">스페셜 마사지</th>
-                  <td className="py-4 px-3 font-bold">90,000원</td>
-                  <td className="py-4 px-3 font-bold">120,000원</td>
-                  <td className="py-4 px-3 font-bold">150,000원</td>
-                </tr>
-                <tr className="bg-[#ba8cff]/10">
-                  <th className="py-4 px-4 font-extrabold text-left sm:text-center text-[#ba8cff]">VIP 스웨디시</th>
-                  <td className="py-4 px-3 font-black text-white">100,000원</td>
-                  <td className="py-4 px-3 font-black text-white">120,000원</td>
-                  <td className="py-4 px-3 font-black text-white">150,000원</td>
-                </tr>
-              </tbody>
-            </table>
+        {/* 인근 다른 동 링크 */}
+        <section className="text-left bg-[#140f24] p-6 rounded-3xl border border-white/10">
+          <h3 className="text-base font-bold text-white mb-3">
+            📍 {districtInfo.name} 인근 다른 지역 안내
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {districtInfo.dongs
+              .filter((d) => d.slug !== dong)
+              .map((otherDong) => {
+                const otherMod = getKeywordModifier(`${cityInfo.name} ${districtInfo.name} ${otherDong.name}`);
+                return (
+                  <Link
+                    key={otherDong.slug}
+                    href={`/${city}/${district}/${otherDong.slug}`}
+                    className="py-2.5 px-2 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-200 font-bold hover:bg-white/20 transition-all truncate"
+                  >
+                    {otherDong.name} 출장 {otherMod.prefix}
+                  </Link>
+                );
+              })}
           </div>
         </section>
-
-        {/* CTA 버튼 */}
-        <div className="grid grid-cols-2 gap-3 max-w-[480px] mx-auto">
-          <a
-            href={`tel:${cityInfo.phone}`}
-            className="py-4 rounded-2xl font-black text-black text-base shadow-lg hover:scale-105 transition-all"
-            style={{ backgroundColor: mainColor }}
-          >
-            📞 {dongInfo.name} 전화예약
-          </a>
-          <a
-            href={`sms:${cityInfo.phone}`}
-            className="py-4 rounded-2xl bg-white text-black font-black text-base shadow-lg hover:scale-105 transition-all"
-          >
-            💬 {dongInfo.name} 문자문의
-          </a>
-        </div>
       </main>
 
-      {/* 모바일 하단 고정바 */}
+      {/* 모바일 하단 고정 바 */}
       <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-20px)] max-w-[500px] bg-[#080611]/95 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-2xl z-50">
         <a
           href={`tel:${cityInfo.phone}`}
           className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1 active:scale-95 transition-all"
           style={{ backgroundColor: mainColor }}
         >
-          📞 {dongInfo.name} 전화 연결하기 ({cityInfo.phone.slice(-4)})
+          📞 {dongInfo.name} 출장 {modifier.prefix} 마사지 문의 ({cityInfo.phone.slice(-4)})
         </a>
       </div>
     </div>

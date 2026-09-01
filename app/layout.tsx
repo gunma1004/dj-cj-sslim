@@ -14,18 +14,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://dj-cj-touchon.netlify.app"),
-  title: "대전 출장마사지 & 청주 출장마사지 | 24시 방문 힐링케어",
+  title: {
+    template: "%s | 터치온 프리미엄 홈 테라피",
+    default: "터치온 | 대전·청주 1:1 맞춤 프리미엄 홈 테라피 & 바디 릴렉싱",
+  },
   description:
-    "대전 및 청주 전 지역 24시 출장마사지 전문. 대전 유성구, 서구, 청주 흥덕구, 청원구 30분 내 빠른 방문, 건식·아로마·스페셜·VIP스웨디시 후불제 안내.",
+    "대전 및 청주 전 지역 프라이빗 방문 테라피 안내. 유성구, 서구, 흥덕구, 청원구 등 1:1 맞춤 아로마, 바디 컨디셔닝, 힐링 릴렉스 케어 예약 가이드.",
   alternates: {
     canonical: "https://dj-cj-touchon.netlify.app",
   },
   openGraph: {
-    title: "대전 출장마사지 & 청주 출장마사지 | 24시 방문 힐링케어",
+    title: "터치온 | 대전·청주 1:1 맞춤 프리미엄 홈 테라피",
     description:
-      "대전 및 청주 전 지역 24시 출장마사지 전문. 대전 유성구, 서구, 청주 흥덕구, 청원구 30분 내 빠른 방문.",
+      "대전·청주 전 지역 프라이빗 방문 힐링 케어 및 바디 컨디셔닝 서비스 안내.",
     url: "https://dj-cj-touchon.netlify.app",
-    siteName: "대전·청주 터치온 출장마사지",
+    siteName: "터치온 (Touch On)",
     locale: "ko_KR",
     type: "website",
   },
