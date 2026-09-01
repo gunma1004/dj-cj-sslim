@@ -196,24 +196,29 @@ export default function HomePage() {
       </section>
 
       <main className="max-w-[960px] mx-auto px-4 mt-12 space-y-16">
-        {/* 지역 선택 카테고리 */}
+        {/* 지역 선택 카테고리 (대전/청주 시 페이지 링크 추가 완료) */}
         <section id="area">
           <div className="text-center mb-8">
             <p className="text-[#ba8cff] font-extrabold text-xs tracking-widest mb-1">LOCATION</p>
             <h2 className="text-2xl sm:text-3xl font-black text-white">지역별 서비스 안내</h2>
-            <p className="text-[#e1d9f5] text-sm mt-1">원하시는 지역(구/동)을 클릭해 상세 케어 안내를 확인하세요.</p>
+            <p className="text-[#e1d9f5] text-sm mt-1">원하시는 지역(시/구/동)을 클릭해 상세 케어 안내를 확인하세요.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
             {/* 대전 파트 */}
             <div className="p-6 rounded-3xl bg-[#140f24] border border-[#00ff88]/30 shadow-2xl">
               <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
-                <h3 className="text-2xl font-black text-white flex items-center gap-2">
-                  <span className="text-[#00ff88]">📍 대전광역시</span>
-                </h3>
-                <span className="text-xs bg-[#00ff88]/20 text-[#00ff88] px-3 py-1 rounded-full font-bold border border-[#00ff88]/30">
-                  대전 케어센터
-                </span>
+                <Link href="/daejeon" className="group">
+                  <h3 className="text-2xl font-black text-white group-hover:text-[#00ff88] transition-colors flex items-center gap-2">
+                    <span className="text-[#00ff88]">📍 대전광역시</span>
+                  </h3>
+                </Link>
+                <Link
+                  href="/daejeon"
+                  className="text-xs bg-[#00ff88]/20 text-[#00ff88] hover:bg-[#00ff88] hover:text-black transition-all px-3 py-1 rounded-full font-bold border border-[#00ff88]/30"
+                >
+                  대전 전체보기 →
+                </Link>
               </div>
 
               <div className="space-y-5">
@@ -227,7 +232,7 @@ export default function HomePage() {
                         <span className="w-1.5 h-4 bg-[#00ff88] rounded-full"></span>
                         대전 {district.name}
                       </span>
-                      <span className="text-xs text-gray-400 font-normal hover:underline">전체보기 →</span>
+                      <span className="text-xs text-gray-400 font-normal hover:underline">구 전체보기 →</span>
                     </Link>
 
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -249,12 +254,17 @@ export default function HomePage() {
             {/* 청주 파트 */}
             <div className="p-6 rounded-3xl bg-[#140f24] border border-[#ba8cff]/30 shadow-2xl">
               <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
-                <h3 className="text-2xl font-black text-white flex items-center gap-2">
-                  <span className="text-[#ba8cff]">📍 청주시</span>
-                </h3>
-                <span className="text-xs bg-[#ba8cff]/20 text-[#ba8cff] px-3 py-1 rounded-full font-bold border border-[#ba8cff]/30">
-                  청주 케어센터
-                </span>
+                <Link href="/cheongju" className="group">
+                  <h3 className="text-2xl font-black text-white group-hover:text-[#ba8cff] transition-colors flex items-center gap-2">
+                    <span className="text-[#ba8cff]">📍 청주시</span>
+                  </h3>
+                </Link>
+                <Link
+                  href="/cheongju"
+                  className="text-xs bg-[#ba8cff]/20 text-[#ba8cff] hover:bg-[#ba8cff] hover:text-black transition-all px-3 py-1 rounded-full font-bold border border-[#ba8cff]/30"
+                >
+                  청주 전체보기 →
+                </Link>
               </div>
 
               <div className="space-y-5">
@@ -268,7 +278,7 @@ export default function HomePage() {
                         <span className="w-1.5 h-4 bg-[#ba8cff] rounded-full"></span>
                         청주 {district.name}
                       </span>
-                      <span className="text-xs text-gray-400 font-normal hover:underline">전체보기 →</span>
+                      <span className="text-xs text-gray-400 font-normal hover:underline">구 전체보기 →</span>
                     </Link>
 
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -289,7 +299,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* 💌 코스 및 요금 안내 */}
+        {/* 💌 코스 및 요금 안내 (신규 코스표 반영 완료) */}
         <section id="course">
           <div className="text-center mb-8">
             <p className="text-[#ba8cff] font-extrabold text-xs tracking-widest mb-1">COURSE & PRICE</p>
