@@ -1,36 +1,41 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CITIES_DATA, DOMAIN, BRAND_NAME, getKeywordModifier } from "@/app/data";
+import { CITIES_DATA, DOMAIN, BRAND_NAME } from "@/app/data";
 import { notFound } from "next/navigation";
 
-// 1000개 이상의 유니크한 조합을 만들기 위한 대규모 수식어 풀
-const DISTRICT_MODIFIER_POOL_A = [
-  "프리미엄", "로열", "VIP", "스페셜", "고품격", "명품", "퍼펙트", "시그니처", 
-  "익스클루시브", "오리지널", "엘리트", "디럭스", "스위트", "베이직", "클래식", 
-  "네추럴", "소울", "하모니", "밸런스", "리프레시", "바이탈", "에너지", "아로마", 
-  "스웨디시", "딥테라피", "컨디셔닝", "바디케어", "순환", "힐링", "안심", "신속",
-  "정성", "집중", "맞춤", "프로페셔널", "메디컬", "스마트", "그린", "블루", "골드"
+// 1000개 이상의 유니크한 조합을 만들기 위한 수식어 풀
+const DISTRICT_TITLE_POOL = [
+  "{{district}} 출장 전문 프리미엄 마사지 안내",
+  "{{city}} {{district}} 맞춤형 출장 스페셜 마사지",
+  "{{district}} 힐링 출장 테라피와 명품 마사지",
+  "{{city}} {{district}} 신속 출장 방문 마사지 가이드",
+  "{{district}} 프리미엄 출장 케어 및 마사지 서비스",
+  "{{city}} {{district}} 로열 출장 바디케어 마사지",
+  "{{district}} 안심 출장 전문 릴렉스 마사지",
+  "{{city}} {{district}} VIP 출장 맞춤형 마사지 코스"
 ];
 
-const DISTRICT_MODIFIER_POOL_B = [
-  "힐링", "테라피", "바디케어", "릴렉싱", "케어", "스파", "컨디셔닝", "쉼터", 
-  "안식처", "재충전", "피로회복", "심신이완", "밸런스", "순환", "리프레시", "포레스트",
-  "오션", "스카이", "스타", "빛고을", "가람", "나루", "미르", "누리", "아라", "마루"
+const MODIFIER_POOL = [
+  "퍼펙트", "시그니처", "익스클루시브", "오리지널", "엘리트", "디럭스", 
+  "스위트", "베이직", "클래식", "소울", "하모니", "밸런스", "리프레시"
 ];
 
-function getLargeScaleUniqueDistrictModifier(seedKey: string) {
+function getLargeScaleUniqueDistrictTitle(cityName: string, districtName: string, seedKey: string) {
   let hash = 0;
   for (let i = 0; i < seedKey.length; i++) {
     hash = (hash << 5) - hash + seedKey.charCodeAt(i);
     hash |= 0;
   }
   const absHash = Math.abs(hash);
-  const indexA = absHash % DISTRICT_MODIFIER_POOL_A.length;
-  const indexB = Math.floor(absHash / 13) % DISTRICT_MODIFIER_POOL_B.length;
-  const indexC = Math.floor(absHash / 31) % DISTRICT_MODIFIER_POOL_A.length;
+  const patternIndex = absHash % DISTRICT_TITLE_POOL.length;
+  const modIndex = Math.floor(absHash / 13) % MODIFIER_POOL.length;
 
-  // 3중 조합으로 1000개 이상의 고유 패턴 생성
-  return DISTRICT_MODIFIER_POOL_A[indexA] + " " + DISTRICT_MODIFIER_POOL_B[indexB] + " " + DISTRICT_MODIFIER_POOL_A[indexC];
+  let pattern = DISTRICT_TITLE_POOL[patternIndex];
+  let formatted = pattern
+    .replace("{{district}}", districtName)
+    .replace("{{city}}", cityName);
+
+  return MODIFIER_POOL[modIndex] + " " + formatted;
 }
 
 export async function generateStaticParams() {
@@ -52,13 +57,13 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   if (!cityInfo || !districtInfo) return {};
 
   const areaName = cityInfo.name + " " + districtInfo.name;
-  const uniquePrefix = getLargeScaleUniqueDistrictModifier(areaName + "_district_1000_seed");
+  const uniqueTitle = getLargeScaleUniqueDistrictTitle(cityInfo.name, districtInfo.name, areaName + "_district_title_1000");
+
+  // 1. 타이틀: '출장'과 '마사지'가 들어가되 중간에 다른 단어들로 분리됨
+  const title = uniqueTitle + " | " + BRAND_NAME;
   
-  // 1. 타이틀: '마사지' 키워드 필수 포함, 1000개 이상 순차적 유니크 조합
-  const title = areaName + " " + uniquePrefix + " 마사지 안내 | " + BRAND_NAME;
-  
-  // 2. 메타 디스크립션: '출장' 단어 포함, '마사지'와 절대 붙지 않도록 넓게 분리
-  const description = areaName + " 전 지역 전문 테라피스트가 신속하게 진행하는 방문 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 후불제.";
+  // 2. 메타 디스크립션: '출장'과 '마사지'가 절대 붙지 않도록 넓게 분리
+  const description = areaName + " 전 지역 신속한 출장 방문 서비스를 통해, 지친 일상의 피로를 말끔히 풀어드릴 품격 있는 힐링 마사지를 제공합니다. 100% 현장 후불제.";
   
   const url = DOMAIN + "/massage/" + city + "/" + district;
 
@@ -79,7 +84,7 @@ export default async function DistrictMassagePage({ params }: { params: Promise<
   const isDaejeon = city === "daejeon";
   const mainColor = isDaejeon ? "#00ff88" : "#ba8cff";
   const areaName = cityInfo.name + " " + districtInfo.name;
-  const uniquePrefix = getLargeScaleUniqueDistrictModifier(areaName + "_district_1000_seed");
+  const uniqueTitle = getLargeScaleUniqueDistrictTitle(cityInfo.name, districtInfo.name, areaName + "_district_title_1000");
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
@@ -97,20 +102,20 @@ export default async function DistrictMassagePage({ params }: { params: Promise<
           <span className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border" style={{ color: mainColor, borderColor: mainColor + "40", backgroundColor: mainColor + "15" }}>
             {areaName} PROGRAM
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black mb-4">{areaName} {uniquePrefix} 마사지 안내</h1>
+          <h1 className="text-3xl sm:text-5xl font-black mb-4">{uniqueTitle}</h1>
           <p className="text-[#e1d9f5] text-base sm:text-lg max-w-[650px] mx-auto leading-relaxed">
             {areaName} 전 지역 고객님이 계신 곳으로 30분 내 신속하게 찾아가는 맞춤형 방문 프로그램입니다.
           </p>
         </div>
 
-        {/* 💡 구 페이지 샵 소개 및 안내 섹션 */}
+        {/* 샵 소개 및 안내 섹션 */}
         <section className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 text-left space-y-6 shadow-xl">
           <h2 className="text-xl sm:text-2xl font-black text-white border-b border-white/10 pb-4 flex items-center gap-2">
             <span>✨</span> {areaName} 프리미엄 홈 바디케어 안내
           </h2>
           <div className="space-y-4 text-sm sm:text-base text-gray-300 leading-relaxed">
             <p>
-              {areaName} 전 지역(호텔, 오피스텔, 주거지 등) 어디서나 편안하게 휴식하실 수 있도록 전문 테라피스트가 직접 방문하여 힐링 마사지를 선사합니다.
+              {areaName} 전 지역(호텔, 오피스텔, 주거지 등) 어디서나 편안하게 휴식하실 수 있도록 전문 테라피스트가 직접 방문하여 힐링 케어를 선사합니다.
             </p>
             <p>
               누적된 피로와 뭉친 근육을 부드럽게 이완시켜 드리며, 선입금 없는 100% 현장 후불제로 안전하고 투명하게 이용하실 수 있습니다.
