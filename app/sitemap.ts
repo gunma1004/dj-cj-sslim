@@ -4,6 +4,7 @@ import { CITIES_DATA, DOMAIN } from '@/app/data';
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
+  // 1. 메인 홈페이지 경로
   const routes: MetadataRoute.Sitemap = [
     {
       url: DOMAIN,
@@ -13,8 +14,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  // 2. 시, 구, 동 전체 데이터 순회 및 등록
   Object.values(CITIES_DATA).forEach((city) => {
-    // 1. '시' 페이지 URL (/daejeon, /cheongju)
+    // 시 페이지 (/daejeon, /cheongju)
     routes.push({
       url: `${DOMAIN}/${city.slug}`,
       lastModified,
@@ -23,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
 
     city.districts.forEach((district) => {
-      // 2. '구' 페이지 URL (/daejeon/yuseong 등)
+      // 구 페이지 (/daejeon/yuseong 등)
       routes.push({
         url: `${DOMAIN}/${city.slug}/${district.slug}`,
         lastModified,
@@ -31,8 +33,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.8,
       });
 
-      // 3. '동' 페이지 URL (/daejeon/yuseong/bongmyeong 등)
       district.dongs.forEach((dong) => {
+        // 동 페이지 (/daejeon/yuseong/bongmyeong 등)
         routes.push({
           url: `${DOMAIN}/${city.slug}/${district.slug}/${dong.slug}`,
           lastModified,

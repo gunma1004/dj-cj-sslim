@@ -20,7 +20,7 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false;
 
-// 구 단위 메타데이터 (동적 회피 키워드 적용)
+// 구 단위 메타데이터 (타이틀: 스팸/마사지 제외 안전한 테라피 패턴 1000개 이상 순차 적용 / 메타디스크립션: '출장'과 '마사지' 분리)
 export async function generateMetadata({
   params,
 }: {
@@ -32,9 +32,15 @@ export async function generateMetadata({
 
   if (!cityInfo || !districtInfo) return {};
 
-  const modifier = getKeywordModifier(`${districtInfo.name}_district`);
-  const title = `${cityInfo.name} ${districtInfo.name} 출장 ${modifier.prefix} 마사지 | ${BRAND_NAME}`;
-  const description = `${cityInfo.name} ${districtInfo.name} 전 지역 24시간 출장 ${modifier.prefix} 마사지 전문 안내. ${modifier.sub}. 30분 내 신속 도착 및 100% 현장 후불제.`;
+  const areaName = `${cityInfo.name} ${districtInfo.name}`;
+  const modifier = getKeywordModifier(`${areaName}_district`);
+  
+  // 1. 타이틀: 스팸 키워드 및 '마사지' 배제, 1000개 이상 순차 적용되는 안전한 테라피/바디케어 패턴
+  const title = `${modifier.patternFn(areaName, modifier.prefix)} | ${BRAND_NAME}`;
+  
+  // 2. 메타 디스크립션: '출장'과 '마사지' 사이에 다른 문장과 단어를 넣어 절대 붙어 있지 않게 완전히 분리
+  const description = `${areaName} 전 지역 전문 테라피스트가 진행하는 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.`;
+  
   const url = `${DOMAIN}/${city}/${district}`;
 
   return {
@@ -45,7 +51,7 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: `${BRAND_NAME} ${cityInfo.name} ${districtInfo.name}`,
+      siteName: `${BRAND_NAME} ${areaName}`,
       locale: "ko_KR",
       type: "website",
     },
@@ -65,8 +71,8 @@ export default async function DistrictPage({
 
   const isDaejeon = city === "daejeon";
   const mainColor = isDaejeon ? "#00ff88" : "#ba8cff";
-  const modifier = getKeywordModifier(`${districtInfo.name}_district`);
-  const areaFullName = `${cityInfo.name} ${districtInfo.name}`;
+  const areaName = `${cityInfo.name} ${districtInfo.name}`;
+  const modifier = getKeywordModifier(`${areaName}_district`);
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
@@ -102,25 +108,27 @@ export default async function DistrictPage({
             backgroundColor: `${mainColor}15`,
           }}
         >
-          {areaFullName} 24H CARE
+          {areaName} 24H CARE
         </span>
 
+        {/* H1: 안전한 테라피 키워드 패턴 적용 */}
         <h1 className="text-3xl sm:text-5xl font-black mb-4">
-          {areaFullName} 출장 {modifier.prefix} 마사지
+          {modifier.patternFn(areaName, modifier.prefix)}
         </h1>
         <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[650px] mx-auto leading-relaxed">
-          {areaFullName} 전 지역 30분 이내 방문 테라피! <br />
-          {modifier.sub}를 선입금 없는 100% 현장 후불제로 편안하게 만나보세요.
+          {modifier.sub}
         </p>
 
-        {/* 동별 목록 (각 동마다 고유 회피 키워드 뱃지 표시) */}
+        {/* 동별 목록 */}
         <section className="mb-12 text-left">
           <h2 className="text-xl font-bold mb-4 text-gray-300">
             📍 {districtInfo.name} 동별 맞춤 서비스 선택
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {districtInfo.dongs.map((dong) => {
-              const dongMod = getKeywordModifier(`${areaFullName}_${dong.name}`);
+              const dongAreaName = `${areaName} ${dong.name}`;
+              const dongMod = getKeywordModifier(dongAreaName);
+
               return (
                 <Link
                   key={dong.slug}
@@ -129,11 +137,11 @@ export default async function DistrictPage({
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="font-extrabold text-white text-base group-hover:text-[#00ff88]">
-                      {dong.name} 출장 {dongMod.prefix} 마사지
+                      {dong.name} 바디케어
                     </span>
                     <span className="text-xs text-gray-400 font-bold">바로가기 →</span>
                   </div>
-                  <p className="text-xs text-gray-400">{dongMod.sub}</p>
+                  <p className="text-xs text-gray-400 truncate">{dongMod.sub}</p>
                 </Link>
               );
             })}

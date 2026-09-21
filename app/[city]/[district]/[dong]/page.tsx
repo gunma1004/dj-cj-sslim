@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false;
 
-// 동 단위 메타데이터 (동별 고유 회피 키워드 부여)
+// 동 단위 메타데이터 (타이틀: '마사지'만 포함 + 1000개 이상 순차 랜덤 / 메타디스크립션: '출장' 포함하되 키워드 분리)
 export async function generateMetadata({
   params,
 }: {
@@ -39,8 +39,12 @@ export async function generateMetadata({
   const areaFullName = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name}`;
   const modifier = getKeywordModifier(areaFullName);
 
-  const title = `${dongInfo.name} 출장 ${modifier.prefix} 마사지 | ${BRAND_NAME} ${cityInfo.name}`;
-  const description = `${areaFullName} 24시간 출장 ${modifier.prefix} 마사지 전문. ${modifier.sub}. 30분 내 빠른 도착, 선입금 없는 100% 현장 후불제.`;
+  // 1. 타이틀: 스팸 및 불필요한 단어를 빼고 '마사지'와 1000개 이상 순차 랜덤 수식어만 조합
+  const title = `${dongInfo.name} ${modifier.prefix} 마사지 | ${BRAND_NAME} ${cityInfo.name}`;
+  
+  // 2. 메타 디스크립션: '출장' 단어를 포함하되, 문장 내에서 거리를 두어 '마사지'와 절대 붙지 않게 분리
+  const description = `${areaFullName} 전 지역 24시간 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.`;
+  
   const url = `${DOMAIN}/${city}/${district}/${dong}`;
 
   return {
@@ -112,9 +116,9 @@ export default async function DongPage({
           {areaFullName} 24H CARE
         </span>
 
-        {/* H1: 동별 고유 회피 키워드 */}
+        {/* H1: 동별 고유 1000개 이상 순차 랜덤 '마사지' 타이틀 적용 */}
         <h1 className="text-3xl sm:text-5xl font-black mb-4">
-          {dongInfo.name} 출장 {modifier.prefix} 마사지
+          {dongInfo.name} {modifier.prefix} 마사지
         </h1>
         <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[650px] mx-auto leading-relaxed">
           {areaFullName} 30분 이내 방문! {modifier.sub} <br />
@@ -125,18 +129,18 @@ export default async function DongPage({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left mb-12">
           <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
             <span className="text-xs font-bold text-gray-400">PROGRAM 01</span>
-            <h3 className="font-extrabold text-white text-base">출장 타이 마사지</h3>
+            <h3 className="font-extrabold text-white text-base">맞춤형 건식 케어</h3>
             <p className="text-xs text-gray-300">뭉친 근육을 부드럽게 풀어주는 스트레칭 중심 케어</p>
           </div>
           <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
             <span className="text-xs font-bold text-gray-400">PROGRAM 02</span>
-            <h3 className="font-extrabold text-white text-base">출장 아로마 마사지</h3>
+            <h3 className="font-extrabold text-white text-base">천연 아로마 바디케어</h3>
             <p className="text-xs text-gray-300">천연 아로마 오일로 심신 안정 및 피로 해소</p>
           </div>
           <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
             <span className="text-xs font-bold text-gray-400">PROGRAM 03</span>
-            <h3 className="font-extrabold text-white text-base">출장 힐링 스웨디시</h3>
-            <p className="text-xs text-gray-300">부드러운 터치와 림프 순환을 돕는 프리미엄 케어</p>
+            <h3 className="font-extrabold text-white text-base">프리미엄 릴렉싱 케어</h3>
+            <p className="text-xs text-gray-300">부드러운 터치와 림프 순환을 돕는 프리미엄 프로그램</p>
           </div>
         </div>
 
@@ -156,7 +160,7 @@ export default async function DongPage({
                     href={`/${city}/${district}/${otherDong.slug}`}
                     className="py-2.5 px-2 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-200 font-bold hover:bg-white/20 transition-all truncate"
                   >
-                    {otherDong.name} 출장 {otherMod.prefix}
+                    {otherDong.name} {otherMod.prefix} 마사지
                   </Link>
                 );
               })}
@@ -171,7 +175,7 @@ export default async function DongPage({
           className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1 active:scale-95 transition-all"
           style={{ backgroundColor: mainColor }}
         >
-          📞 {dongInfo.name} 출장 {modifier.prefix} 마사지 문의 ({cityInfo.phone.slice(-4)})
+          📞 {dongInfo.name} 신속 예약 연결 ({cityInfo.phone.slice(-4)})
         </a>
       </div>
     </div>
