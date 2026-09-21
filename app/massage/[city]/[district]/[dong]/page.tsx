@@ -21,7 +21,7 @@ const DONG_MODIFIER_POOL_A = [
   "프리미엄", "로열", "VIP", "스페셜", "고품격", "명품", "퍼펙트", "시그니처", 
   "익스클루시브", "오리지널", "엘리트", "디럭스", "스위트", "베이직", "클래식", 
   "네추럴", "소울", "하모니", "밸런스", "리프레시", "바이탈", "에너지", "아로마", 
-  "스웨디시", "딥테라피", "컨디셔닝", "바디케er", "순환", "힐링", "안심", "신속"
+  "스웨디시", "딥테라피", "컨디셔닝", "바디케어", "순환", "힐링", "안심", "신속"
 ];
 
 function getLargeScaleUniqueDongTitle(cityName: string, districtName: string, dongName: string, seedKey: string) {
