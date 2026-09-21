@@ -13,53 +13,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1.0,
   });
 
-  // 2. 시, 구, 동 및 각각의 /massage 페이지 전체 자동 생성
+  // 2. /massage/시/구/동 구조에 맞춘 전체 경로 자동 생성
   Object.entries(CITIES_DATA).forEach(([citySlug, city]) => {
-    // 시 메인 페이지
+    // 시 레벨 페이지 (/massage/city)
     routes.push({
-      url: DOMAIN + "/" + citySlug,
-      lastModified,
-      changeFrequency: "daily",
-      priority: 0.9,
-    });
-
-    // 시 /massage 페이지
-    routes.push({
-      url: DOMAIN + "/" + citySlug + "/massage",
+      url: DOMAIN + "/massage/" + citySlug,
       lastModified,
       changeFrequency: "daily",
       priority: 0.9,
     });
 
     city.districts.forEach((district) => {
-      // 구 메인 페이지
+      // 구 레벨 페이지 (/massage/city/district)
       routes.push({
-        url: DOMAIN + "/" + citySlug + "/" + district.slug,
-        lastModified,
-        changeFrequency: "weekly",
-        priority: 0.8,
-      });
-
-      // 구 /massage 페이지
-      routes.push({
-        url: DOMAIN + "/" + citySlug + "/" + district.slug + "/massage",
+        url: DOMAIN + "/massage/" + citySlug + "/" + district.slug,
         lastModified,
         changeFrequency: "weekly",
         priority: 0.8,
       });
 
       district.dongs.forEach((dong) => {
-        // 동 메인 페이지
+        // 동 레벨 페이지 (/massage/city/district/dong)
         routes.push({
-          url: DOMAIN + "/" + citySlug + "/" + district.slug + "/" + dong.slug,
-          lastModified,
-          changeFrequency: "weekly",
-          priority: 0.7,
-        });
-
-        // 동 /massage 페이지
-        routes.push({
-          url: DOMAIN + "/" + citySlug + "/" + district.slug + "/" + dong.slug + "/massage",
+          url: DOMAIN + "/massage/" + citySlug + "/" + district.slug + "/" + dong.slug,
           lastModified,
           changeFrequency: "weekly",
           priority: 0.7,
