@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false;
 
-// 동 단위 메타데이터 (타이틀: '마사지'만 포함 + 1000개 이상 순차 랜덤 / 메타디스크립션: '출장' 포함하되 키워드 분리)
+// 동 단위 메타데이터 (타이틀: '마사지' 필수 포함 / 메타디스크립션: '출장'과 '마사지' 키워드 완전히 분리)
 export async function generateMetadata({
   params,
 }: {
@@ -39,10 +39,10 @@ export async function generateMetadata({
   const areaFullName = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name}`;
   const modifier = getKeywordModifier(areaFullName);
 
-  // 1. 타이틀: 스팸 및 불필요한 단어를 빼고 '마사지'와 1000개 이상 순차 랜덤 수식어만 조합
-  const title = `${dongInfo.name} ${modifier.prefix} 마사지 | ${BRAND_NAME} ${cityInfo.name}`;
+  // 1. 타이틀: '마사지' 키워드 필수 포함 (데이터의 seoTitle 활용 또는 조합)
+  const title = dongInfo.seoTitle || `${dongInfo.name} ${modifier.prefix} 마사지 | ${BRAND_NAME} ${cityInfo.name}`;
   
-  // 2. 메타 디스크립션: '출장' 단어를 포함하되, 문장 내에서 거리를 두어 '마사지'와 절대 붙지 않게 분리
+  // 2. 메타 디스크립션: '출장'과 '마사지'가 절대 붙어 있지 않도록 문장 중간에 충분한 거리를 두어 분리
   const description = `${areaFullName} 전 지역 24시간 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.`;
   
   const url = `${DOMAIN}/${city}/${district}/${dong}`;
@@ -104,45 +104,60 @@ export default async function DongPage({
         </div>
       </header>
 
-      <main className="py-12 px-4 max-w-[900px] mx-auto text-center">
-        <span
-          className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
-          style={{
-            color: mainColor,
-            borderColor: `${mainColor}40`,
-            backgroundColor: `${mainColor}15`,
-          }}
-        >
-          {areaFullName} 24H CARE
-        </span>
+      <main className="py-12 px-4 max-w-[900px] mx-auto text-center space-y-12">
+        <div>
+          <span
+            className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
+            style={{
+              color: mainColor,
+              borderColor: `${mainColor}40`,
+              backgroundColor: `${mainColor}15`,
+            }}
+          >
+            {areaFullName} 24H CARE
+          </span>
 
-        {/* H1: 동별 고유 1000개 이상 순차 랜덤 '마사지' 타이틀 적용 */}
-        <h1 className="text-3xl sm:text-5xl font-black mb-4">
-          {dongInfo.name} {modifier.prefix} 마사지
-        </h1>
-        <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[650px] mx-auto leading-relaxed">
-          {areaFullName} 30분 이내 방문! {modifier.sub} <br />
-          선입금 요구 없는 100% 안전 현장 후불제로 안심하고 이용하세요.
-        </p>
-
-        {/* 케어 코스 안내 */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left mb-12">
-          <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
-            <span className="text-xs font-bold text-gray-400">PROGRAM 01</span>
-            <h3 className="font-extrabold text-white text-base">맞춤형 건식 케어</h3>
-            <p className="text-xs text-gray-300">뭉친 근육을 부드럽게 풀어주는 스트레칭 중심 케어</p>
-          </div>
-          <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
-            <span className="text-xs font-bold text-gray-400">PROGRAM 02</span>
-            <h3 className="font-extrabold text-white text-base">천연 아로마 바디케어</h3>
-            <p className="text-xs text-gray-300">천연 아로마 오일로 심신 안정 및 피로 해소</p>
-          </div>
-          <div className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-2">
-            <span className="text-xs font-bold text-gray-400">PROGRAM 03</span>
-            <h3 className="font-extrabold text-white text-base">프리미엄 릴렉싱 케어</h3>
-            <p className="text-xs text-gray-300">부드러운 터치와 림프 순환을 돕는 프리미엄 프로그램</p>
-          </div>
+          {/* H1 본문 제목 (마사지 키워드 포함) */}
+          <h1 className="text-3xl sm:text-5xl font-black mb-4">
+            {dongInfo.contentHeading || `${dongInfo.name} ${modifier.prefix} 마사지 안내`}
+          </h1>
+          <p className="text-[#e1d9f5] text-base sm:text-lg max-w-[650px] mx-auto leading-relaxed">
+            {dongInfo.contentBody || `${areaFullName} 30분 이내 방문! 선입금 요구 없는 100% 안전 현장 후불제로 안심하고 이용하세요.`}
+          </p>
         </div>
+
+        {/* 동 페이지 상세 업체 소개 및 케어 코스 안내 섹션 */}
+        <section className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 text-left space-y-6 shadow-xl">
+          <h2 className="text-xl sm:text-2xl font-black text-white border-b border-white/10 pb-4 flex items-center gap-2">
+            <span>✨</span> {dongInfo.name} 맞춤형 방문 테라피 안내
+          </h2>
+          <div className="space-y-4 text-sm sm:text-base text-gray-300 leading-relaxed">
+            <p>
+              {areaFullName} 인근 호텔, 오피스텔, 자택 등 고객님이 편안하게 휴식 취하시는 공간으로 전문 테라피스트가 신속하게 방문하여 일상의 피로를 말끔히 씻어드립니다.
+            </p>
+            <p>
+              엄선된 천연 오일과 체계적인 바디 컨디셔닝 프로그램을 통해 무거워진 몸의 밸런스를 되찾아 드립니다.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-white/10">
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+              <span className="text-xs font-bold text-[#00ff88]">PROGRAM 01</span>
+              <h3 className="font-extrabold text-white text-base">맞춤형 건식 케어</h3>
+              <p className="text-xs text-gray-400">뭉친 근육을 부드럽게 풀어주는 스트레칭 중심</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+              <span className="text-xs font-bold text-[#ba8cff]">PROGRAM 02</span>
+              <h3 className="font-extrabold text-white text-base">천연 아로마 바디케어</h3>
+              <p className="text-xs text-gray-400">부드러운 오일링을 통한 심신 안정 및 순환</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+              <span className="text-xs font-bold text-yellow-400">PROGRAM 03</span>
+              <h3 className="font-extrabold text-white text-base">프리미엄 릴렉싱 케어</h3>
+              <p className="text-xs text-gray-400">최상의 편안함을 선사하는 1:1 집중 프로그램</p>
+            </div>
+          </div>
+        </section>
 
         {/* 인근 다른 동 링크 */}
         <section className="text-left bg-[#140f24] p-6 rounded-3xl border border-white/10">
