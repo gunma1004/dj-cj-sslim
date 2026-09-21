@@ -23,7 +23,6 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false;
 
-// 동 단위 메타데이터 (타이틀: '마사지' 필수 포함 / 메타디스크립션: '출장'과 '마사지' 키워드 완전히 분리)
 export async function generateMetadata({
   params,
 }: {
@@ -36,16 +35,12 @@ export async function generateMetadata({
 
   if (!cityInfo || !districtInfo || !dongInfo) return {};
 
-  const areaFullName = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name}`;
+  const areaFullName = cityInfo.name + " " + districtInfo.name + " " + dongInfo.name;
   const modifier = getKeywordModifier(areaFullName);
 
-  // 1. 타이틀: '마사지' 키워드 필수 포함 (데이터의 seoTitle 활용 또는 조합)
-  const title = dongInfo.seoTitle || `${dongInfo.name} ${modifier.prefix} 마사지 | ${BRAND_NAME} ${cityInfo.name}`;
-  
-  // 2. 메타 디스크립션: '출장'과 '마사지'가 절대 붙어 있지 않도록 문장 중간에 충분한 거리를 두어 분리
-  const description = `${areaFullName} 전 지역 24시간 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.`;
-  
-  const url = `${DOMAIN}/${city}/${district}/${dong}`;
+  const title = dongInfo.seoTitle || dongInfo.name + " " + modifier.prefix + " 마사지 | " + BRAND_NAME + " " + cityInfo.name;
+  const description = areaFullName + " 전 지역 24시간 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.";
+  const url = DOMAIN + "/" + city + "/" + district + "/" + dong;
 
   return {
     title,
@@ -55,7 +50,7 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: `${BRAND_NAME} ${dongInfo.name}`,
+      siteName: BRAND_NAME + " " + dongInfo.name,
       locale: "ko_KR",
       type: "website",
     },
@@ -76,18 +71,17 @@ export default async function DongPage({
 
   const isDaejeon = city === "daejeon";
   const mainColor = isDaejeon ? "#00ff88" : "#ba8cff";
-  const areaFullName = `${cityInfo.name} ${districtInfo.name} ${dongInfo.name}`;
+  const areaFullName = cityInfo.name + " " + districtInfo.name + " " + dongInfo.name;
   const modifier = getKeywordModifier(areaFullName);
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
-      {/* GNB */}
       <header className="sticky top-0 z-40 bg-[#080611]/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1160px] mx-auto h-[66px] px-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/images/logo.png"
-              alt={`${BRAND_NAME} 홈케어`}
+              alt={BRAND_NAME + " 홈케어"}
               width={300}
               height={80}
               className="h-8 sm:h-10 w-auto object-contain"
@@ -95,7 +89,7 @@ export default async function DongPage({
             />
           </Link>
           <a
-            href={`tel:${cityInfo.phone}`}
+            href={"tel:" + cityInfo.phone}
             className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black transition-transform hover:scale-105"
             style={{ backgroundColor: mainColor }}
           >
@@ -110,23 +104,21 @@ export default async function DongPage({
             className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
             style={{
               color: mainColor,
-              borderColor: `${mainColor}40`,
-              backgroundColor: `${mainColor}15`,
+              borderColor: mainColor + "40",
+              backgroundColor: mainColor + "15",
             }}
           >
             {areaFullName} 24H CARE
           </span>
 
-          {/* H1 본문 제목 (마사지 키워드 포함) */}
           <h1 className="text-3xl sm:text-5xl font-black mb-4">
-            {dongInfo.contentHeading || `${dongInfo.name} ${modifier.prefix} 마사지 안내`}
+            {dongInfo.contentHeading || dongInfo.name + " " + modifier.prefix + " 마사지 안내"}
           </h1>
           <p className="text-[#e1d9f5] text-base sm:text-lg max-w-[650px] mx-auto leading-relaxed">
-            {dongInfo.contentBody || `${areaFullName} 30분 이내 방문! 선입금 요구 없는 100% 안전 현장 후불제로 안심하고 이용하세요.`}
+            {dongInfo.contentBody || areaFullName + " 30분 이내 방문! 선입금 요구 없는 100% 안전 현장 후불제로 안심하고 이용하세요."}
           </p>
         </div>
 
-        {/* 동 페이지 상세 업체 소개 및 케어 코스 안내 섹션 */}
         <section className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 text-left space-y-6 shadow-xl">
           <h2 className="text-xl sm:text-2xl font-black text-white border-b border-white/10 pb-4 flex items-center gap-2">
             <span>✨</span> {dongInfo.name} 맞춤형 방문 테라피 안내
@@ -159,7 +151,6 @@ export default async function DongPage({
           </div>
         </section>
 
-        {/* 인근 다른 동 링크 */}
         <section className="text-left bg-[#140f24] p-6 rounded-3xl border border-white/10">
           <h3 className="text-base font-bold text-white mb-3">
             📍 {districtInfo.name} 인근 다른 지역 안내
@@ -168,11 +159,11 @@ export default async function DongPage({
             {districtInfo.dongs
               .filter((d) => d.slug !== dong)
               .map((otherDong) => {
-                const otherMod = getKeywordModifier(`${cityInfo.name} ${districtInfo.name} ${otherDong.name}`);
+                const otherMod = getKeywordModifier(cityInfo.name + " " + districtInfo.name + " " + otherDong.name);
                 return (
                   <Link
                     key={otherDong.slug}
-                    href={`/${city}/${district}/${otherDong.slug}`}
+                    href={"/" + city + "/" + district + "/" + otherDong.slug}
                     className="py-2.5 px-2 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-200 font-bold hover:bg-white/20 transition-all truncate"
                   >
                     {otherDong.name} {otherMod.prefix} 마사지
@@ -183,10 +174,9 @@ export default async function DongPage({
         </section>
       </main>
 
-      {/* 모바일 하단 고정 바 */}
       <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-20px)] max-w-[500px] bg-[#080611]/95 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-2xl z-50">
         <a
-          href={`tel:${cityInfo.phone}`}
+          href={"tel:" + cityInfo.phone}
           className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1 active:scale-95 transition-all"
           style={{ backgroundColor: mainColor }}
         >

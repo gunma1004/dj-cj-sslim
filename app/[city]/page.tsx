@@ -1,47 +1,63 @@
 import Link from "next/link";
 import Image from "next/image";
-import { CITIES_DATA, DOMAIN, BRAND_NAME, getKeywordModifier } from "@/app/data";
+import { CITIES_DATA, DOMAIN, BRAND_NAME } from "@/app/data";
 import { notFound } from "next/navigation";
 
+// 500개 이상 겹치지 않도록 구성된 대규모 수식어 풀
+const CITY_PREFIX_POOL = [
+  "프리미엄", "힐링", "전문", "맞춤", "스웨디시", "아로마", "감동", "딥테라피", 
+  "프라이빗", "로열", "VIP", "릴렉싱", "컨디셔닝", "바디케어", "순환", "아로마테라피", 
+  "스페셜", "심신이완", "피로회복", "릴랙스", "맞춤형", "고품격", "명품", "집중", 
+  "정성", "안심", "신속", "품격", "스마트", "베이직", "디럭스", "스위트", "내추럴",
+  "소울", "하모니", "밸런스", "리프레시", "에너지", "바이탈", "휴", "쉼", "지오",
+  "그린", "블루", "골드", "실버", "퍼플", "로즈", "샌드", "오션", "포레스트"
+];
+
+function getUniqueCityModifier(seedKey: string) {
+  let hash = 0;
+  for (let i = 0; i < seedKey.length; i++) {
+    hash = (hash << 5) - hash + seedKey.charCodeAt(i);
+    hash |= 0;
+  }
+  const index = Math.abs(hash) % CITY_PREFIX_POOL.length;
+  const secondaryIndex = Math.floor(Math.abs(hash) / 7) % CITY_PREFIX_POOL.length;
+  
+  const prefix = index !== secondaryIndex 
+    ? CITY_PREFIX_POOL[index] + " " + CITY_PREFIX_POOL[secondaryIndex] 
+    : CITY_PREFIX_POOL[index];
+
+  return prefix;
+}
+
+// 1. 시 정적 경로 등록 (daejeon, cheongju)
 export async function generateStaticParams() {
-  const paths: { city: string; district: string }[] = [];
-
-  Object.entries(CITIES_DATA).forEach(([citySlug, city]) => {
-    city.districts.forEach((district) => {
-      paths.push({
-        city: citySlug,
-        district: district.slug,
-      });
-    });
-  });
-
-  return paths;
+  return Object.keys(CITIES_DATA).map((city) => ({
+    city: city,
+  }));
 }
 
 export const dynamicParams = false;
 
-// 구 단위 메타데이터 (타이틀: 스팸/마사지 제외 안전한 테라피 패턴 / 메타디스크립션: '출장'과 '마사지' 완전 분리)
+// 2. 시 단위 SEO 메타데이터 (백틱 제거 - 빌드 에러 원천 차단)
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ city: string; district: string }>;
+  params: Promise<{ city: string }>;
 }) {
-  const { city, district } = await params;
+  const { city } = await params;
   const cityInfo = CITIES_DATA[city];
-  const districtInfo = cityInfo?.districts.find((d) => d.slug === district);
 
-  if (!cityInfo || !districtInfo) return {};
+  if (!cityInfo) return {};
 
-  const areaName = `${cityInfo.name} ${districtInfo.name}`;
-  const modifier = getKeywordModifier(`${areaName}_district`);
+  const uniquePrefix = getUniqueCityModifier(cityInfo.name + "_city_title_seed");
   
-  // 1. 타이틀: 스팸 키워드 및 '마사지' 배제, 안전한 테라피/바디케어 패턴
-  const title = `${modifier.patternFn(areaName, modifier.prefix)} | ${BRAND_NAME}`;
+  // 타이틀: '출장' 제외, 고유 수식어 + '마사지' 포함
+  const title = cityInfo.name + " " + uniquePrefix + " 마사지 안내 | " + BRAND_NAME;
   
-  // 2. 메타 디스크립션: '출장'과 '마사지' 사이에 다른 단어를 넣어 절대 붙어 있지 않게 분리
-  const description = `${areaName} 전 지역 전문 테라피스트가 진행하는 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.`;
+  // 메타 디스크립션: '출장'과 '마사지'를 멀리 분리
+  const description = cityInfo.name + " 전 지역 전문 테라피스트의 신속한 출장 서비스와 함께 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 100% 현장 후불제.";
   
-  const url = `${DOMAIN}/${city}/${district}`;
+  const url = DOMAIN + "/" + city;
 
   return {
     title,
@@ -51,28 +67,27 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: `${BRAND_NAME} ${areaName}`,
+      siteName: BRAND_NAME + " " + cityInfo.name,
       locale: "ko_KR",
       type: "website",
     },
   };
 }
 
-export default async function DistrictPage({
+// 3. 시 페이지 본문
+export default async function CityPage({
   params,
 }: {
-  params: Promise<{ city: string; district: string }>;
+  params: Promise<{ city: string }>;
 }) {
-  const { city, district } = await params;
+  const { city } = await params;
   const cityInfo = CITIES_DATA[city];
-  const districtInfo = cityInfo?.districts.find((d) => d.slug === district);
 
-  if (!cityInfo || !districtInfo) return notFound();
+  if (!cityInfo) return notFound();
 
   const isDaejeon = city === "daejeon";
   const mainColor = isDaejeon ? "#00ff88" : "#ba8cff";
-  const areaName = `${cityInfo.name} ${districtInfo.name}`;
-  const modifier = getKeywordModifier(`${areaName}_district`);
+  const uniquePrefix = getUniqueCityModifier(cityInfo.name + "_city_title_seed");
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
@@ -82,7 +97,7 @@ export default async function DistrictPage({
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/images/logo.png"
-              alt={`${BRAND_NAME} 홈케어`}
+              alt={BRAND_NAME + " 홈케어"}
               width={300}
               height={80}
               className="h-8 sm:h-10 w-auto object-contain"
@@ -90,11 +105,11 @@ export default async function DistrictPage({
             />
           </Link>
           <a
-            href={`tel:${cityInfo.phone}`}
+            href={"tel:" + cityInfo.phone}
             className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black transition-transform hover:scale-105"
             style={{ backgroundColor: mainColor }}
           >
-            📞 {districtInfo.name} 예약 문의
+            📞 {cityInfo.name}지역 예약 문의
           </a>
         </div>
       </header>
@@ -105,31 +120,31 @@ export default async function DistrictPage({
             className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
             style={{
               color: mainColor,
-              borderColor: `${mainColor}40`,
-              backgroundColor: `${mainColor}15`,
+              borderColor: mainColor + "40",
+              backgroundColor: mainColor + "15",
             }}
           >
-            {areaName} 24H CARE
+            {cityInfo.name.toUpperCase()} 24H CARE
           </span>
 
           {/* H1 본문 제목 */}
           <h1 className="text-3xl sm:text-5xl font-black mb-4">
-            {modifier.patternFn(areaName, modifier.prefix)}
+            {cityInfo.name} {uniquePrefix} 마사지 안내
           </h1>
           <p className="text-[#e1d9f5] text-base sm:text-lg max-w-[650px] mx-auto leading-relaxed">
-            {modifier.sub} <br />
-            선입금 없는 100% 현장 후불제로 편안하고 안전하게 이용해 보세요.
+            {cityInfo.name} 전 지역 전문 테라피스트 30분 이내 방문! <br />
+            선입금 없는 100% 현장 후불제로 편안하게 이용해 보세요.
           </p>
         </div>
 
-        {/* 💡 구 페이지 추가 업체 내용 및 서비스 안내 섹션 */}
+        {/* 💡 시 페이지 추가 업체 내용 및 서비스 안내 섹션 */}
         <section className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 text-left space-y-6 shadow-xl">
           <h2 className="text-xl sm:text-2xl font-black text-white border-b border-white/10 pb-4 flex items-center gap-2">
-            <span>✨</span> {areaName} 프리미엄 홈 바디케어 안내
+            <span>✨</span> {cityInfo.name} 전역 프리미엄 홈 바디케어 안내
           </h2>
           <div className="space-y-4 text-sm sm:text-base text-gray-300 leading-relaxed">
             <p>
-              {areaName} 전 지역(호텔, 오피스텔, 주거지 등) 어디서나 고객님이 계신 곳으로 전문 테라피스트가 직접 찾아가는 맞춤형 방문 테라피 서비스입니다.
+              {cityInfo.name} 전 지역(호텔, 오피스텔, 주거지 등) 어디서나 고객님이 계신 곳으로 전문 테라피스트가 직접 찾아가는 맞춤형 방문 테라피 서비스입니다.
             </p>
             <p>
               지친 일상 속 누적된 피로와 뭉친 근육을 부드럽게 이완시켜 드리며, 철저한 위생 관리와 프라이버시 보호를 바탕으로 최상의 힐링 타임을 선사합니다.
@@ -151,30 +166,50 @@ export default async function DistrictPage({
           </div>
         </section>
 
-        {/* 동별 목록 */}
-        <section className="text-left">
+        {/* 구별 선택 섹션 */}
+        <section className="mb-12 text-left">
           <h2 className="text-xl font-bold mb-4 text-gray-300">
-            📍 {districtInfo.name} 동별 맞춤 서비스 선택
+            📍 {cityInfo.name} 구별 상세 안내
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {districtInfo.dongs.map((dong) => {
-              const dongAreaName = `${areaName} ${dong.name}`;
-              const dongMod = getKeywordModifier(dongAreaName);
+            {cityInfo.districts.map((district) => {
+              const districtPrefix = getUniqueCityModifier(cityInfo.name + "_" + district.name + "_seed");
 
               return (
-                <Link
-                  key={dong.slug}
-                  href={`/${city}/${district}/${dong.slug}`}
-                  className="p-4 rounded-2xl bg-[#140f24] border border-white/10 hover:border-white/30 transition-all block group"
+                <div
+                  key={district.slug}
+                  className="p-5 rounded-2xl bg-[#140f24] border border-white/10 space-y-3"
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-extrabold text-white text-base group-hover:text-[#00ff88]">
-                      {dong.name} 바디케어
-                    </span>
-                    <span className="text-xs text-gray-400 font-bold">바로가기 →</span>
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <div>
+                      <h3 className="text-lg font-bold text-white">
+                        {district.name} 마사지
+                      </h3>
+                      <p className="text-[11px] text-gray-400">{districtPrefix} 맞춤 케어 서비스</p>
+                    </div>
+                    <Link
+                      href={"/" + city + "/" + district.slug}
+                      className="text-xs font-bold hover:underline shrink-0 ml-2"
+                      style={{ color: mainColor }}
+                    >
+                      구 전체보기 →
+                    </Link>
                   </div>
-                  <p className="text-xs text-gray-400 truncate">{dongMod.sub}</p>
-                </Link>
+
+                  {/* 동 버튼 목록 */}
+                  <div className="grid grid-cols-3 gap-2 pt-1">
+                    {district.dongs.map((dong) => (
+                      <Link
+                        key={dong.slug}
+                        href={"/" + city + "/" + district.slug + "/" + dong.slug}
+                        className="py-2 px-1 text-center rounded-xl bg-white/5 border border-white/10 text-xs text-gray-200 font-bold hover:bg-white/20 transition-all truncate"
+                        title={dong.name + " 마사지"}
+                      >
+                        {dong.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -184,11 +219,11 @@ export default async function DistrictPage({
       {/* 모바일 하단 고정바 */}
       <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-20px)] max-w-[500px] bg-[#080611]/95 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-2xl z-50">
         <a
-          href={`tel:${cityInfo.phone}`}
+          href={"tel:" + cityInfo.phone}
           className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1 active:scale-95 transition-all"
           style={{ backgroundColor: mainColor }}
         >
-          📞 {districtInfo.name} 빠른 예약 연결 ({cityInfo.phone.slice(-4)})
+          📞 {cityInfo.name} 마사지 예약 문의 ({cityInfo.phone.slice(-4)})
         </a>
       </div>
     </div>

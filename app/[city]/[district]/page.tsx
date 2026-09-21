@@ -20,7 +20,7 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false;
 
-// 구 단위 메타데이터 (타이틀: 스팸/마사지 제외 안전한 테라피 패턴 1000개 이상 순차 적용 / 메타디스크립션: '출장'과 '마사지' 분리)
+// 구 단위 메타데이터 (백틱 사용 안 함 - 빌드 에러 원천 차단)
 export async function generateMetadata({
   params,
 }: {
@@ -32,16 +32,16 @@ export async function generateMetadata({
 
   if (!cityInfo || !districtInfo) return {};
 
-  const areaName = `${cityInfo.name} ${districtInfo.name}`;
-  const modifier = getKeywordModifier(`${areaName}_district`);
+  const areaName = cityInfo.name + " " + districtInfo.name;
+  const modifier = getKeywordModifier(areaName + "_district");
   
-  // 1. 타이틀: 스팸 키워드 및 '마사지' 배제, 1000개 이상 순차 적용되는 안전한 테라피/바디케어 패턴
-  const title = `${modifier.patternFn(areaName, modifier.prefix)} | ${BRAND_NAME}`;
+  // 1. 타이틀: 스팸 및 '마사지' 배제
+  const title = modifier.patternFn(areaName, modifier.prefix) + " | " + BRAND_NAME;
   
-  // 2. 메타 디스크립션: '출장'과 '마사지' 사이에 다른 문장과 단어를 넣어 절대 붙어 있지 않게 완전히 분리
-  const description = `${areaName} 전 지역 전문 테라피스트가 진행하는 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.`;
+  // 2. 메타 디스크립션: '출장'과 '마사지'를 완전히 분리 (백틱 제거)
+  const description = areaName + " 전 지역 전문 테라피스트가 진행하는 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.";
   
-  const url = `${DOMAIN}/${city}/${district}`;
+  const url = DOMAIN + "/" + city + "/" + district;
 
   return {
     title,
@@ -51,7 +51,7 @@ export async function generateMetadata({
       title,
       description,
       url,
-      siteName: `${BRAND_NAME} ${areaName}`,
+      siteName: BRAND_NAME + " " + areaName,
       locale: "ko_KR",
       type: "website",
     },
@@ -71,8 +71,8 @@ export default async function DistrictPage({
 
   const isDaejeon = city === "daejeon";
   const mainColor = isDaejeon ? "#00ff88" : "#ba8cff";
-  const areaName = `${cityInfo.name} ${districtInfo.name}`;
-  const modifier = getKeywordModifier(`${areaName}_district`);
+  const areaName = cityInfo.name + " " + districtInfo.name;
+  const modifier = getKeywordModifier(areaName + "_district");
 
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen relative overflow-x-hidden pb-36">
@@ -82,7 +82,7 @@ export default async function DistrictPage({
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/images/logo.png"
-              alt={`${BRAND_NAME} 홈케어`}
+              alt={BRAND_NAME + " 홈케어"}
               width={300}
               height={80}
               className="h-8 sm:h-10 w-auto object-contain"
@@ -90,7 +90,7 @@ export default async function DistrictPage({
             />
           </Link>
           <a
-            href={`tel:${cityInfo.phone}`}
+            href={"tel:" + cityInfo.phone}
             className="px-4 py-2 rounded-full font-black text-xs sm:text-sm text-black transition-transform hover:scale-105"
             style={{ backgroundColor: mainColor }}
           >
@@ -99,40 +99,72 @@ export default async function DistrictPage({
         </div>
       </header>
 
-      <main className="py-12 px-4 max-w-[900px] mx-auto text-center">
-        <span
-          className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
-          style={{
-            color: mainColor,
-            borderColor: `${mainColor}40`,
-            backgroundColor: `${mainColor}15`,
-          }}
-        >
-          {areaName} 24H CARE
-        </span>
+      <main className="py-12 px-4 max-w-[900px] mx-auto text-center space-y-12">
+        <div>
+          <span
+            className="inline-block px-3.5 py-1 rounded-full text-xs font-black mb-3 border"
+            style={{
+              color: mainColor,
+              borderColor: mainColor + "40",
+              backgroundColor: mainColor + "15",
+            }}
+          >
+            {areaName} 24H CARE
+          </span>
 
-        {/* H1: 안전한 테라피 키워드 패턴 적용 */}
-        <h1 className="text-3xl sm:text-5xl font-black mb-4">
-          {modifier.patternFn(areaName, modifier.prefix)}
-        </h1>
-        <p className="text-[#e1d9f5] text-base sm:text-lg mb-8 max-w-[650px] mx-auto leading-relaxed">
-          {modifier.sub}
-        </p>
+          {/* H1 본문 제목 */}
+          <h1 className="text-3xl sm:text-5xl font-black mb-4">
+            {modifier.patternFn(areaName, modifier.prefix)}
+          </h1>
+          <p className="text-[#e1d9f5] text-base sm:text-lg max-w-[650px] mx-auto leading-relaxed">
+            {modifier.sub} <br />
+            선입금 없는 100% 현장 후불제로 편안하고 안전하게 이용해 보세요.
+          </p>
+        </div>
+
+        {/* 💡 구 페이지 추가 업체 내용 및 서비스 안내 섹션 */}
+        <section className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 text-left space-y-6 shadow-xl">
+          <h2 className="text-xl sm:text-2xl font-black text-white border-b border-white/10 pb-4 flex items-center gap-2">
+            <span>✨</span> {areaName} 프리미엄 홈 바디케어 안내
+          </h2>
+          <div className="space-y-4 text-sm sm:text-base text-gray-300 leading-relaxed">
+            <p>
+              {areaName} 전 지역(호텔, 오피스텔, 주거지 등) 어디서나 고객님이 계신 곳으로 전문 테라피스트가 직접 찾아가는 맞춤형 방문 테라피 서비스입니다.
+            </p>
+            <p>
+              지친 일상 속 누적된 피로와 뭉친 근육을 부드럽게 이완시켜 드리며, 철저한 위생 관리와 프라이버시 보호를 바탕으로 최상의 힐링 타임을 선사합니다.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-white/10">
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                <p className="font-bold text-white text-sm">⏱ 신속한 방문</p>
+                <p className="text-xs text-gray-400">지역별 30분 이내 도착</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                <p className="font-bold text-white text-sm">💳 100% 현장 후불</p>
+                <p className="text-xs text-gray-400">선입금 없는 안전한 결제</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1">
+                <p className="font-bold text-white text-sm">📞 24시간 연중무휴</p>
+                <p className="text-xs text-gray-400">실시간 맞춤 예약 상담</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* 동별 목록 */}
-        <section className="mb-12 text-left">
+        <section className="text-left">
           <h2 className="text-xl font-bold mb-4 text-gray-300">
             📍 {districtInfo.name} 동별 맞춤 서비스 선택
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {districtInfo.dongs.map((dong) => {
-              const dongAreaName = `${areaName} ${dong.name}`;
+              const dongAreaName = areaName + " " + dong.name;
               const dongMod = getKeywordModifier(dongAreaName);
 
               return (
                 <Link
                   key={dong.slug}
-                  href={`/${city}/${district}/${dong.slug}`}
+                  href={"/" + city + "/" + district + "/" + dong.slug}
                   className="p-4 rounded-2xl bg-[#140f24] border border-white/10 hover:border-white/30 transition-all block group"
                 >
                   <div className="flex items-center justify-between mb-1">
@@ -152,7 +184,7 @@ export default async function DistrictPage({
       {/* 모바일 하단 고정바 */}
       <div className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-20px)] max-w-[500px] bg-[#080611]/95 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-2xl z-50">
         <a
-          href={`tel:${cityInfo.phone}`}
+          href={"tel:" + cityInfo.phone}
           className="py-3 rounded-xl font-black text-black text-sm flex items-center justify-center gap-1 active:scale-95 transition-all"
           style={{ backgroundColor: mainColor }}
         >
