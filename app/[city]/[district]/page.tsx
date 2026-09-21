@@ -20,7 +20,7 @@ export async function generateStaticParams() {
 
 export const dynamicParams = false;
 
-// 구 단위 메타데이터 (백틱 사용 안 함 - 빌드 에러 원천 차단)
+// 구 단위 메타데이터 (타입 에러 방지 및 백틱 제거)
 export async function generateMetadata({
   params,
 }: {
@@ -35,10 +35,10 @@ export async function generateMetadata({
   const areaName = cityInfo.name + " " + districtInfo.name;
   const modifier = getKeywordModifier(areaName + "_district");
   
-  // 1. 타이틀: 스팸 및 '마사지' 배제
-  const title = modifier.patternFn(areaName, modifier.prefix) + " | " + BRAND_NAME;
+  // 1. 타이틀: 지역명 + 모디파이어 프리픽스 + 마사지 조합 (타입 안전)
+  const title = areaName + " " + modifier.prefix + " 마사지 | " + BRAND_NAME;
   
-  // 2. 메타 디스크립션: '출장'과 '마사지'를 완전히 분리 (백틱 제거)
+  // 2. 메타 디스크립션: '출장'과 '마사지'를 멀리 분리
   const description = areaName + " 전 지역 전문 테라피스트가 진행하는 신속한 출장 서비스와 함께 일상의 피로를 녹여줄 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 현장 후불제.";
   
   const url = DOMAIN + "/" + city + "/" + district;
@@ -114,7 +114,7 @@ export default async function DistrictPage({
 
           {/* H1 본문 제목 */}
           <h1 className="text-3xl sm:text-5xl font-black mb-4">
-            {modifier.patternFn(areaName, modifier.prefix)}
+            {areaName} {modifier.prefix} 마사지
           </h1>
           <p className="text-[#e1d9f5] text-base sm:text-lg max-w-[650px] mx-auto leading-relaxed">
             {modifier.sub} <br />
