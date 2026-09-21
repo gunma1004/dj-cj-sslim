@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { CITIES_DATA, BRAND_NAME } from "@/app/data";
+import { CITIES_DATA } from "@/app/data";
 
 export default function HomePage() {
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen pb-24">
-      {/* 상단 배너 섹션 (컴포넌트 의존성 제거) */}
+      {/* 상단 배너 섹션 */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white py-20 md:py-28 px-6 text-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -39,7 +39,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 지역별 /massage 페이지 바로가기 섹션 */}
+      {/* 변경된 /massage/... 주소 체계에 맞춘 권역별 바로가기 섹션 */}
       <main id="area" className="py-16 px-4 max-w-[1160px] mx-auto space-y-16">
         <div className="text-center space-y-3">
           <span className="inline-block px-3.5 py-1 rounded-full text-xs font-black bg-indigo-500/15 text-[#00ff88] border border-[#00ff88]/30">
@@ -64,7 +64,7 @@ export default function HomePage() {
                 key={citySlug}
                 className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 space-y-6 shadow-xl"
               >
-                {/* 시 바로가기 헤더 */}
+                {/* 시 바로가기 헤더 (/massage/시 형식) */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-4">
                   <div>
                     <h3 className="text-xl font-extrabold text-white">
@@ -73,7 +73,7 @@ export default function HomePage() {
                     <p className="text-xs text-gray-400">24시간 신속 방문 홈 테라피</p>
                   </div>
                   <Link
-                    href={"/" + citySlug + "/massage"}
+                    href={"/massage/" + citySlug}
                     className="px-4 py-2 rounded-xl text-xs font-bold text-black transition-transform hover:scale-105"
                     style={{ backgroundColor: accentColor }}
                   >
@@ -81,13 +81,13 @@ export default function HomePage() {
                   </Link>
                 </div>
 
-                {/* 구별 / 동별 마사지 페이지 링크 목록 */}
+                {/* 구별 / 동별 마사지 페이지 링크 목록 (/massage/시/구 및 /massage/시/구/동 형식) */}
                 <div className="space-y-4">
                   {city.districts.map((district) => (
                     <div key={district.slug} className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Link
-                          href={"/" + citySlug + "/" + district.slug + "/massage"}
+                          href={"/massage/" + citySlug + "/" + district.slug}
                           className="text-sm font-bold text-gray-200 hover:text-white flex items-center gap-1"
                         >
                           <span style={{ color: accentColor }}>📍</span> {district.name} 마사지
@@ -99,7 +99,7 @@ export default function HomePage() {
                         {district.dongs.map((dong) => (
                           <Link
                             key={dong.slug}
-                            href={"/" + citySlug + "/" + district.slug + "/" + dong.slug + "/massage"}
+                            href={"/massage/" + citySlug + "/" + district.slug + "/" + dong.slug}
                             className="py-1.5 px-1 text-center rounded-lg bg-white/5 border border-white/5 text-[11px] text-gray-300 font-medium hover:bg-white/20 transition-all truncate"
                           >
                             {dong.name}
