@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   const title = sequentialTitle + " | " + BRAND_NAME;
   
   // 2. 메타 디스크립션: '출장'과 '마사지'가 모두 들어가되 절대 붙지 않도록 넓게 분리
-  const description = cityInfo.name + " 전 지역 전문 테라피스트의 신속한 출장 방문 서비스를 통해 지친 일상의 피로를 말끔히 풀어드릴 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 후불제.";
+  const description = cityInfo.name + " 전 지역 전문 테라피스트의 신속한 출장 서비스를 통해 지친 일상의 피로를 말끔히 풀어드릴 편안한 힐링 마사지를 경험해 보세요. 선입금 없는 후불제.";
   
   const url = DOMAIN + "/massage/" + city;
 

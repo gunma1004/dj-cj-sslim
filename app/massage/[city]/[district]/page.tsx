@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ city: str
   const title = uniqueTitle + " | " + BRAND_NAME;
   
   // 2. 메타 디스크립션: '출장'과 '마사지'가 절대 붙지 않도록 넓게 분리
-  const description = areaName + " 전 지역 신속한 출장 방문 서비스를 통해, 지친 일상의 피로를 말끔히 풀어드릴 품격 있는 힐링 마사지를 제공합니다. 100% 현장 후불제.";
+  const description = areaName + " 전 지역 신속한 출장 마사지 서비스를 통해, 지친 일상의 피로를 말끔히 풀어드릴 품격 있는 힐링을 제공합니다. 100% 현장 후불제.";
   
   const url = DOMAIN + "/massage/" + city + "/" + district;
 
