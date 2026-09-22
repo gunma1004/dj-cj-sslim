@@ -13,7 +13,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1.0,
   });
 
-  // 2. /massage/시/구/동 구조에 맞춘 전체 경로 자동 생성
+  // 1-1. 따로 추가하고 싶은 대전, 청주 전용 독립 페이지
+  routes.push(
+    {
+      url: DOMAIN + "/daejeon",
+      lastModified,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: DOMAIN + "/cheongju",
+      lastModified,
+      changeFrequency: "daily",
+      priority: 0.9,
+    }
+  );
+
+  // 2. /massage/시/구/동 구조에 맞춘 전체 경로 자동 생성 (기존 로직)
   Object.entries(CITIES_DATA).forEach(([citySlug, city]) => {
     // 시 레벨 페이지 (/massage/city)
     routes.push({
