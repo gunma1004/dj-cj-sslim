@@ -1,11 +1,90 @@
 import { MetadataRoute } from "next";
-import { CITIES_DATA, DOMAIN } from "@/app/data";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+const DOMAIN = "https://dj-cj-sslim.netlify.app";
+
+// 외부 import 깨짐을 방지하는 안전 내장 데이터
+const SITEMAP_CITIES_DATA = {
+  daejeon: {
+    slug: "daejeon",
+    districts: [
+      {
+        slug: "seo",
+        dongs: [
+          "dunsan", "wolpyeong", "tanbang", "galma", "mannyeon", "gwejeong",
+          "yongmun", "gajang", "nae", "byeon", "doma", "jeongnim", "boksu",
+          "gwanjeo", "doan", "gasuwon", "giseong"
+        ],
+      },
+      {
+        slug: "yuseong",
+        dongs: [
+          "bongmyeong", "gundong", "jangdae", "guam", "sangdae", "wonsinheung",
+          "noeun", "jijok", "banseok", "sinsung", "jeonmin", "gwanpyeong",
+          "yongsan", "taprip", "deokmyeong", "hakhwa", "jinjam"
+        ],
+      },
+      {
+        slug: "junggu",
+        dongs: [
+          "eunhaeng", "seonhwa", "daeheung", "oryu", "taepyeong", "yucheon",
+          "munhwa", "sanseong", "yongdu", "mok", "jungchon"
+        ],
+      },
+      {
+        slug: "donggu",
+        dongs: [
+          "yongjeon", "gayang", "hondo", "seongnam", "zayang", "panam",
+          "sinan", "indong", "hyodong", "daedong"
+        ],
+      },
+      {
+        slug: "daedeokgu",
+        dongs: [
+          "songchon", "jungni", "birae", "beopdong", "sintanjin", "seokbong",
+          "moksang", "ojeong", "daehwa"
+        ],
+      },
+    ],
+  },
+  cheongju: {
+    slug: "cheongju",
+    districts: [
+      {
+        slug: "sangdang",
+        dongs: [
+          "seongan", "jungang", "tapdaeseong", "yeongun", "geumcheon",
+          "yongdam_myeongam_sanseong", "yongam"
+        ],
+      },
+      {
+        slug: "seowon",
+        dongs: [
+          "sajik", "sachang", "mochung", "sannam", "bunpyeong", "sugok",
+          "seonghwa_gaeshin_jukrim"
+        ],
+      },
+      {
+        slug: "heungdeok",
+        dongs: [
+          "bokdae", "gagyeong", "biha", "bongmyeong-cj", "uncheon_sinbong",
+          "gangseo", "songjeol"
+        ],
+      },
+      {
+        slug: "cheongwon",
+        dongs: [
+          "yullyang", "ochang", "jujung", "uwam", "naedeok", "ogunjang", "naesu"
+        ],
+      },
+    ],
+  },
+};
+
+export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const routes: MetadataRoute.Sitemap = [];
 
-  // 1. 메인 홈
+  // 1. 메인 및 단독 시 페이지
   routes.push({
     url: DOMAIN,
     lastModified,
@@ -13,7 +92,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1.0,
   });
 
-  // 2. 단독 대전·청주 홈 랜딩
   routes.push(
     {
       url: `${DOMAIN}/daejeon`,
@@ -29,7 +107,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   );
 
-  // 3. 이벤트 메인 허브
+  // 2. 이벤트 메인 허브
   routes.push({
     url: `${DOMAIN}/event`,
     lastModified,
@@ -37,9 +115,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   });
 
-  // 4. /massage 및 /event 전체 시·구·동 자동 루프 등록
-  Object.entries(CITIES_DATA).forEach(([citySlug, city]) => {
-    // [시] 마사지 & 이벤트
+  // 3. /massage 및 /event [시 / 구 / 동] 전체 자동 루프 생성
+  Object.entries(SITEMAP_CITIES_DATA).forEach(([citySlug, city]) => {
+    // [시] 레벨
     routes.push(
       {
         url: `${DOMAIN}/massage/${citySlug}`,
@@ -56,7 +134,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
 
     city.districts.forEach((district) => {
-      // [구] 마사지 & 이벤트
+      // [구] 레벨
       routes.push(
         {
           url: `${DOMAIN}/massage/${citySlug}/${district.slug}`,
@@ -72,17 +150,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }
       );
 
-      // [동] 마사지 & 이벤트
-      district.dongs.forEach((dong) => {
+      // [동] 레벨
+      district.dongs.forEach((dongSlug) => {
         routes.push(
           {
-            url: `${DOMAIN}/massage/${citySlug}/${district.slug}/${dong.slug}`,
+            url: `${DOMAIN}/massage/${citySlug}/${district.slug}/${dongSlug}`,
             lastModified,
             changeFrequency: "weekly",
             priority: 0.7,
           },
           {
-            url: `${DOMAIN}/event/${citySlug}/${district.slug}/${dong.slug}`,
+            url: `${DOMAIN}/event/${citySlug}/${district.slug}/${dongSlug}`,
             lastModified,
             changeFrequency: "weekly",
             priority: 0.75,
