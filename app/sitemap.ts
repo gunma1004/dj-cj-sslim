@@ -5,7 +5,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
   const routes: MetadataRoute.Sitemap = [];
 
-  // 1. 메인 페이지
+  // 1. 메인 홈
   routes.push({
     url: DOMAIN,
     lastModified,
@@ -13,49 +13,81 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1.0,
   });
 
-  // 1-1. 따로 추가하고 싶은 대전, 청주 전용 독립 페이지
+  // 2. 단독 대전·청주 홈 랜딩
   routes.push(
     {
-      url: DOMAIN + "/daejeon",
+      url: `${DOMAIN}/daejeon`,
       lastModified,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: DOMAIN + "/cheongju",
+      url: `${DOMAIN}/cheongju`,
       lastModified,
       changeFrequency: "daily",
       priority: 0.9,
     }
   );
 
-  // 2. /massage/시/구/동 구조에 맞춘 전체 경로 자동 생성 (기존 로직)
+  // 3. 이벤트 메인 허브
+  routes.push({
+    url: `${DOMAIN}/event`,
+    lastModified,
+    changeFrequency: "daily",
+    priority: 0.9,
+  });
+
+  // 4. /massage 및 /event 전체 시·구·동 자동 루프 등록
   Object.entries(CITIES_DATA).forEach(([citySlug, city]) => {
-    // 시 레벨 페이지 (/massage/city)
-    routes.push({
-      url: DOMAIN + "/massage/" + citySlug,
-      lastModified,
-      changeFrequency: "daily",
-      priority: 0.9,
-    });
+    // [시] 마사지 & 이벤트
+    routes.push(
+      {
+        url: `${DOMAIN}/massage/${citySlug}`,
+        lastModified,
+        changeFrequency: "daily",
+        priority: 0.9,
+      },
+      {
+        url: `${DOMAIN}/event/${citySlug}`,
+        lastModified,
+        changeFrequency: "daily",
+        priority: 0.85,
+      }
+    );
 
     city.districts.forEach((district) => {
-      // 구 레벨 페이지 (/massage/city/district)
-      routes.push({
-        url: DOMAIN + "/massage/" + citySlug + "/" + district.slug,
-        lastModified,
-        changeFrequency: "weekly",
-        priority: 0.8,
-      });
-
-      district.dongs.forEach((dong) => {
-        // 동 레벨 페이지 (/massage/city/district/dong)
-        routes.push({
-          url: DOMAIN + "/massage/" + citySlug + "/" + district.slug + "/" + dong.slug,
+      // [구] 마사지 & 이벤트
+      routes.push(
+        {
+          url: `${DOMAIN}/massage/${citySlug}/${district.slug}`,
           lastModified,
           changeFrequency: "weekly",
-          priority: 0.7,
-        });
+          priority: 0.8,
+        },
+        {
+          url: `${DOMAIN}/event/${citySlug}/${district.slug}`,
+          lastModified,
+          changeFrequency: "weekly",
+          priority: 0.8,
+        }
+      );
+
+      // [동] 마사지 & 이벤트
+      district.dongs.forEach((dong) => {
+        routes.push(
+          {
+            url: `${DOMAIN}/massage/${citySlug}/${district.slug}/${dong.slug}`,
+            lastModified,
+            changeFrequency: "weekly",
+            priority: 0.7,
+          },
+          {
+            url: `${DOMAIN}/event/${citySlug}/${district.slug}/${dong.slug}`,
+            lastModified,
+            changeFrequency: "weekly",
+            priority: 0.75,
+          }
+        );
       });
     });
   });

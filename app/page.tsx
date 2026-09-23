@@ -4,7 +4,21 @@ import { CITIES_DATA } from "@/app/data";
 export default function HomePage() {
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen pb-24">
-      {/* 상단 배너 섹션 */}
+      {/* 상단 퀵 알림 바: 이벤트 전용 바로가기 */}
+      <div className="bg-gradient-to-r from-rose-950 via-purple-950 to-indigo-950 border-b border-rose-500/30 px-4 py-2 text-center text-xs sm:text-sm font-medium">
+        <Link
+          href="/event"
+          className="inline-flex items-center gap-2 text-rose-300 hover:text-white transition"
+        >
+          <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[11px] font-bold border border-rose-500/30">
+            EVENT
+          </span>
+          <span>대전·청주 오픈 기념 첫 방문 10,000원 즉시 할인 &amp; 제휴 혜택 진행 중!</span>
+          <span className="text-white/60">자세히 보기 →</span>
+        </Link>
+      </div>
+
+      {/* 상단 히어로 배너 섹션 */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white py-20 md:py-28 px-6 text-center">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -29,18 +43,57 @@ export default function HomePage() {
             >
               📞 실시간 예약 문의
             </a>
+            {/* 이벤트 페이지 바로가기 버튼 */}
+            <Link
+              href="/event"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white font-semibold transition-all duration-200 shadow-lg shadow-rose-600/20 text-center flex items-center justify-center gap-2"
+            >
+              🎁 특별 할인 이벤트 확인
+            </Link>
             <a
               href="#area"
               className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-medium transition-colors duration-200 text-center"
             >
-              지역별 서비스 안내 보기
+              지역별 서비스 안내
             </a>
           </div>
         </div>
       </section>
 
-      {/* 변경된 /massage/... 주소 체계에 맞춘 권역별 바로가기 섹션 */}
-      <main id="area" className="py-16 px-4 max-w-[1160px] mx-auto space-y-16">
+      {/* 🎁 메인 중간: 진행 중인 이벤트 퀵 하이라이트 섹션 */}
+      <section className="py-12 px-4 max-w-[1160px] mx-auto">
+        <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-rose-950/40 via-purple-950/30 to-[#140f24] border border-rose-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+          <div className="space-y-2 text-center md:text-left">
+            <span className="inline-block text-xs font-bold text-rose-400 bg-rose-500/20 border border-rose-500/30 px-3 py-1 rounded-full">
+              SPECIAL PROMOTIONS
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-white">
+              대전·청주 고객님을 위한 단독 프로모션
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-300 max-w-xl leading-relaxed">
+              첫 방문 고객 1만원 즉시 차감, 낮 시간대 얼리버드 오일 업그레이드, 리뷰 작성 시 10분 연장권까지 풍성한 혜택을 놓치지 마세요.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap sm:flex-nowrap gap-3 shrink-0 w-full md:w-auto">
+            <Link
+              href="/event/daejeon"
+              className="flex-1 md:flex-initial px-5 py-3 rounded-xl bg-[#00ff88]/15 border border-[#00ff88]/40 text-[#00ff88] font-bold text-xs sm:text-sm hover:bg-[#00ff88]/25 text-center transition"
+            >
+              대전 이벤트 보기 →
+            </Link>
+            <Link
+              href="/event/cheongju"
+              className="flex-1 md:flex-initial px-5 py-3 rounded-xl bg-[#ba8cff]/15 border border-[#ba8cff]/40 text-[#ba8cff] font-bold text-xs sm:text-sm hover:bg-[#ba8cff]/25 text-center transition"
+            >
+              청주 이벤트 보기 →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 권역별 바로가기 섹션 */}
+      <main id="area" className="py-10 px-4 max-w-[1160px] mx-auto space-y-16">
         <div className="text-center space-y-3">
           <span className="inline-block px-3.5 py-1 rounded-full text-xs font-black bg-indigo-500/15 text-[#00ff88] border border-[#00ff88]/30">
             QUICK NAVIGATION
@@ -62,26 +115,37 @@ export default function HomePage() {
             return (
               <div 
                 key={citySlug}
-                className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 space-y-6 shadow-xl"
+                className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 space-y-6 shadow-xl relative overflow-hidden"
               >
-                {/* 시 바로가기 헤더 (/massage/시 형식) */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                {/* 시 바로가기 헤더 */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
                   <div>
-                    <h3 className="text-xl font-extrabold text-white">
+                    <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
                       {city.name} 지역
                     </h3>
-                    <p className="text-xs text-gray-400">24시간 신속 방문 홈 테라피</p>
+                    <p className="text-xs text-gray-400 mt-0.5">24시간 신속 방문 홈 테라피</p>
                   </div>
-                  <Link
-                    href={"/massage/" + citySlug}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-black transition-transform hover:scale-105"
-                    style={{ backgroundColor: accentColor }}
-                  >
-                    {city.name} 마사지 전체보기 →
-                  </Link>
+
+                  <div className="flex items-center gap-2">
+                    {/* 해당 시 이벤트 페이지 바로가기 버튼 */}
+                    <Link
+                      href={"/event/" + citySlug}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold text-rose-300 bg-rose-500/20 border border-rose-500/30 hover:bg-rose-500/30 transition-all text-center"
+                    >
+                      🎁 {city.name} 이벤트
+                    </Link>
+                    {/* 해당 시 마사지 서비스 바로가기 버튼 */}
+                    <Link
+                      href={"/massage/" + citySlug}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold text-black transition-transform hover:scale-105 text-center"
+                      style={{ backgroundColor: accentColor }}
+                    >
+                      서비스 안내 →
+                    </Link>
+                  </div>
                 </div>
 
-                {/* 구별 / 동별 마사지 페이지 링크 목록 (/massage/시/구 및 /massage/시/구/동 형식) */}
+                {/* 구별 / 동별 마사지 페이지 링크 목록 */}
                 <div className="space-y-4">
                   {city.districts.map((district) => (
                     <div key={district.slug} className="space-y-2">
