@@ -1,6 +1,9 @@
+// ⚠️ Netlify 서버리스 런타임 크래시(500 에러)를 방지하는 완전 정적 생성 강제 옵션
+export const dynamic = "force-static";
+
 import Link from "next/link";
 
-// 외부 import 오류를 원천 차단하기 위한 메인 전용 지역 데이터
+// 외부 import 경로 충돌을 방지하기 위한 안전 내장 데이터
 const LOCAL_CITIES_DATA = {
   daejeon: {
     slug: "daejeon",
