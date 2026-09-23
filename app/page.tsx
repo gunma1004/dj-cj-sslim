@@ -1,11 +1,170 @@
 import Link from "next/link";
-// ⚠️ 만약 파일명이 app/data/regions.ts 라면 아래 줄을 "@/app/data/regions" 로 변경하세요!
-import { CITIES_DATA } from "@/app/data";
+
+// 외부 import 오류를 원천 차단하기 위한 메인 전용 지역 데이터
+const LOCAL_CITIES_DATA = {
+  daejeon: {
+    slug: "daejeon",
+    name: "대전",
+    phone: "0507-1280-3335",
+    districts: [
+      {
+        slug: "seo",
+        name: "서구",
+        dongs: [
+          { slug: "dunsan", name: "둔산동" },
+          { slug: "wolpyeong", name: "월평동" },
+          { slug: "tanbang", name: "탄방동" },
+          { slug: "galma", name: "갈마동" },
+          { slug: "mannyeon", name: "만년동" },
+          { slug: "gwejeong", name: "괴정동" },
+          { slug: "yongmun", name: "용문동" },
+          { slug: "gajang", name: "가장동" },
+          { slug: "nae", name: "내동" },
+          { slug: "byeon", name: "변동" },
+          { slug: "doma", name: "도마동" },
+          { slug: "jeongnim", name: "정림동" },
+          { slug: "boksu", name: "복수동" },
+          { slug: "gwanjeo", name: "관저동" },
+          { slug: "doan", name: "도안동" },
+          { slug: "gasuwon", name: "가수원동" },
+          { slug: "giseong", name: "기성동" },
+        ],
+      },
+      {
+        slug: "yuseong",
+        name: "유성구",
+        dongs: [
+          { slug: "bongmyeong", name: "봉명동" },
+          { slug: "gundong", name: "궁동" },
+          { slug: "jangdae", name: "장대동" },
+          { slug: "guam", name: "구암동" },
+          { slug: "sangdae", name: "상대동" },
+          { slug: "wonsinheung", name: "원신흥동" },
+          { slug: "noeun", name: "노은동" },
+          { slug: "jijok", name: "지족동" },
+          { slug: "banseok", name: "반석동" },
+          { slug: "sinsung", name: "신성동" },
+          { slug: "jeonmin", name: "전민동" },
+          { slug: "gwanpyeong", name: "관평동" },
+          { slug: "yongsan", name: "용산동" },
+          { slug: "taprip", name: "탑립동" },
+          { slug: "deokmyeong", name: "덕명동" },
+          { slug: "hakhwa", name: "학하동" },
+          { slug: "jinjam", name: "진잠동" },
+        ],
+      },
+      {
+        slug: "junggu",
+        name: "중구",
+        dongs: [
+          { slug: "eunhaeng", name: "은행동" },
+          { slug: "seonhwa", name: "선화동" },
+          { slug: "daeheung", name: "대흥동" },
+          { slug: "oryu", name: "오류동" },
+          { slug: "taepyeong", name: "태평동" },
+          { slug: "yucheon", name: "유천동" },
+          { slug: "munhwa", name: "문화동" },
+          { slug: "sanseong", name: "산성동" },
+          { slug: "yongdu", name: "용두동" },
+          { slug: "mok", name: "목동" },
+          { slug: "jungchon", name: "중촌동" },
+        ],
+      },
+      {
+        slug: "donggu",
+        name: "동구",
+        dongs: [
+          { slug: "yongjeon", name: "용전동" },
+          { slug: "gayang", name: "가양동" },
+          { slug: "hondo", name: "홍도동" },
+          { slug: "seongnam", name: "성남동" },
+          { slug: "zayang", name: "자양동" },
+          { slug: "panam", name: "판암동" },
+          { slug: "sinan", name: "신안동" },
+          { slug: "indong", name: "인동" },
+          { slug: "hyodong", name: "효동" },
+          { slug: "daedong", name: "대동" },
+        ],
+      },
+      {
+        slug: "daedeokgu",
+        name: "대덕구",
+        dongs: [
+          { slug: "songchon", name: "송촌동" },
+          { slug: "jungni", name: "중리동" },
+          { slug: "birae", name: "비래동" },
+          { slug: "beopdong", name: "법동" },
+          { slug: "sintanjin", name: "신탄진동" },
+          { slug: "seokbong", name: "석봉동" },
+          { slug: "moksang", name: "목상동" },
+          { slug: "ojeong", name: "오정동" },
+          { slug: "daehwa", name: "대화동" },
+        ],
+      },
+    ],
+  },
+  cheongju: {
+    slug: "cheongju",
+    name: "청주",
+    phone: "0507-1280-3336",
+    districts: [
+      {
+        slug: "sangdang",
+        name: "상당구",
+        dongs: [
+          { slug: "seongan", name: "성안동" },
+          { slug: "jungang", name: "중앙동" },
+          { slug: "tapdaeseong", name: "탑대성동" },
+          { slug: "yeongun", name: "영운동" },
+          { slug: "geumcheon", name: "금천동" },
+          { slug: "yongdam_myeongam_sanseong", name: "용담명암산성동" },
+          { slug: "yongam", name: "용암동" },
+        ],
+      },
+      {
+        slug: "seowon",
+        name: "서원구",
+        dongs: [
+          { slug: "sajik", name: "사직동" },
+          { slug: "sachang", name: "사창동" },
+          { slug: "mochung", name: "모충동" },
+          { slug: "sannam", name: "산남동" },
+          { slug: "bunpyeong", name: "분평동" },
+          { slug: "sugok", name: "수곡동" },
+          { slug: "seonghwa_gaeshin_jukrim", name: "성화개신죽림동" },
+        ],
+      },
+      {
+        slug: "heungdeok",
+        name: "흥덕구",
+        dongs: [
+          { slug: "bokdae", name: "복대동" },
+          { slug: "gagyeong", name: "가경동" },
+          { slug: "biha", name: "비하동" },
+          { slug: "bongmyeong-cj", name: "봉명동" },
+          { slug: "uncheon_sinbong", name: "운천신봉동" },
+          { slug: "gangseo", name: "강서동" },
+          { slug: "songjeol", name: "송절동" },
+        ],
+      },
+      {
+        slug: "cheongwon",
+        name: "청원구",
+        dongs: [
+          { slug: "yullyang", name: "율량동" },
+          { slug: "ochang", name: "오창읍" },
+          { slug: "jujung", name: "주중동" },
+          { slug: "uwam", name: "우암동" },
+          { slug: "naedeok", name: "내덕동" },
+          { slug: "ogunjang", name: "오근장동" },
+          { slug: "naesu", name: "내수읍" },
+        ],
+      },
+    ],
+  },
+};
 
 export default function HomePage() {
-  // CITIES_DATA가 혹시 비어있거나 경로 오류일 때 서버 다운 방지 가드
-  const citiesList = CITIES_DATA ? Object.entries(CITIES_DATA) : [];
-
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen pb-24">
       {/* 상단 퀵 알림 바 */}
@@ -109,9 +268,9 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* 시 단위 및 하위 구/동 마사지 페이지 링크 목록 */}
+        {/* 시 단위 및 하위 구/동 링크 목록 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {citiesList.map(([citySlug, city]) => {
+          {Object.entries(LOCAL_CITIES_DATA).map(([citySlug, city]) => {
             const isDaejeon = citySlug === "daejeon";
             const accentColor = isDaejeon ? "#00ff88" : "#ba8cff";
 
