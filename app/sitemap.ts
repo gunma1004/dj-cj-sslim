@@ -1,8 +1,10 @@
+// ⚠️ 정적 익스포트(output: 'export') 시 필수 선언
+export const dynamic = "force-static";
+
 import { MetadataRoute } from "next";
 
 const DOMAIN = "https://dj-cj-sslim.netlify.app";
 
-// 외부 import 깨짐을 방지하는 안전 내장 데이터
 const SITEMAP_CITIES_DATA = {
   daejeon: {
     slug: "daejeon",
@@ -117,7 +119,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   // 3. /massage 및 /event [시 / 구 / 동] 전체 자동 루프 생성
   Object.entries(SITEMAP_CITIES_DATA).forEach(([citySlug, city]) => {
-    // [시] 레벨
     routes.push(
       {
         url: `${DOMAIN}/massage/${citySlug}`,
@@ -134,7 +135,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     );
 
     city.districts.forEach((district) => {
-      // [구] 레벨
       routes.push(
         {
           url: `${DOMAIN}/massage/${citySlug}/${district.slug}`,
@@ -150,7 +150,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         }
       );
 
-      // [동] 레벨
       district.dongs.forEach((dongSlug) => {
         routes.push(
           {
