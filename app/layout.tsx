@@ -1,16 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://dj-cj-sslim.netlify.app"),
@@ -44,18 +33,14 @@ export const metadata: Metadata = {
   },
 };
 
-// ⚠️ 이 RootLayout 함수가 없으면 사이트 전체 500 에러가 납니다!
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-[#080611] text-white">
+    <html lang="ko" className="h-full antialiased">
+      <body className="min-h-full flex flex-col bg-[#080611] text-white font-sans">
         <div className="flex-1">{children}</div>
       </body>
     </html>
