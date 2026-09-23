@@ -44,6 +44,7 @@ export const metadata: Metadata = {
   },
 };
 
+// ⚠️ 이 RootLayout 함수가 없으면 사이트 전체 500 에러가 납니다!
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -55,7 +56,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#080611] text-white">
-        {/* 각 페이지 본문 (메인, 시/구/동 페이지) */}
         <div className="flex-1">{children}</div>
       </body>
     </html>
