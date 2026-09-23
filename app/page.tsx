@@ -1,10 +1,14 @@
 import Link from "next/link";
+// ⚠️ 만약 파일명이 app/data/regions.ts 라면 아래 줄을 "@/app/data/regions" 로 변경하세요!
 import { CITIES_DATA } from "@/app/data";
 
 export default function HomePage() {
+  // CITIES_DATA가 혹시 비어있거나 경로 오류일 때 서버 다운 방지 가드
+  const citiesList = CITIES_DATA ? Object.entries(CITIES_DATA) : [];
+
   return (
     <div className="bg-[#080611] text-white font-sans min-h-screen pb-24">
-      {/* 상단 퀵 알림 바: 이벤트 전용 바로가기 */}
+      {/* 상단 퀵 알림 바 */}
       <div className="bg-gradient-to-r from-rose-950 via-purple-950 to-indigo-950 border-b border-rose-500/30 px-4 py-2 text-center text-xs sm:text-sm font-medium">
         <Link
           href="/event"
@@ -13,7 +17,7 @@ export default function HomePage() {
           <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[11px] font-bold border border-rose-500/30">
             EVENT
           </span>
-          <span>대전·청주 오픈 기념 첫 방문 10,000원 즉시 할인 &amp; 제휴 혜택 진행 중!</span>
+          <span>대전·청주 오픈 기념 첫 방문 10,000원 즉시 할인 및 제휴 혜택 진행 중!</span>
           <span className="text-white/60">자세히 보기 →</span>
         </Link>
       </div>
@@ -43,7 +47,6 @@ export default function HomePage() {
             >
               📞 실시간 예약 문의
             </a>
-            {/* 이벤트 페이지 바로가기 버튼 */}
             <Link
               href="/event"
               className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white font-semibold transition-all duration-200 shadow-lg shadow-rose-600/20 text-center flex items-center justify-center gap-2"
@@ -60,7 +63,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 🎁 메인 중간: 진행 중인 이벤트 퀵 하이라이트 섹션 */}
+      {/* 이벤트 퀵 하이라이트 섹션 */}
       <section className="py-12 px-4 max-w-[1160px] mx-auto">
         <div className="p-6 md:p-8 rounded-3xl bg-gradient-to-r from-rose-950/40 via-purple-950/30 to-[#140f24] border border-rose-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
           <div className="space-y-2 text-center md:text-left">
@@ -108,7 +111,7 @@ export default function HomePage() {
 
         {/* 시 단위 및 하위 구/동 마사지 페이지 링크 목록 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {Object.entries(CITIES_DATA).map(([citySlug, city]) => {
+          {citiesList.map(([citySlug, city]) => {
             const isDaejeon = citySlug === "daejeon";
             const accentColor = isDaejeon ? "#00ff88" : "#ba8cff";
 
@@ -117,7 +120,6 @@ export default function HomePage() {
                 key={citySlug}
                 className="p-6 sm:p-8 rounded-3xl bg-[#140f24] border border-white/10 space-y-6 shadow-xl relative overflow-hidden"
               >
-                {/* 시 바로가기 헤더 */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-3">
                   <div>
                     <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
@@ -127,14 +129,12 @@ export default function HomePage() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {/* 해당 시 이벤트 페이지 바로가기 버튼 */}
                     <Link
                       href={"/event/" + citySlug}
                       className="px-3 py-1.5 rounded-xl text-xs font-bold text-rose-300 bg-rose-500/20 border border-rose-500/30 hover:bg-rose-500/30 transition-all text-center"
                     >
                       🎁 {city.name} 이벤트
                     </Link>
-                    {/* 해당 시 마사지 서비스 바로가기 버튼 */}
                     <Link
                       href={"/massage/" + citySlug}
                       className="px-3 py-1.5 rounded-xl text-xs font-bold text-black transition-transform hover:scale-105 text-center"
@@ -145,7 +145,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* 구별 / 동별 마사지 페이지 링크 목록 */}
                 <div className="space-y-4">
                   {city.districts.map((district) => (
                     <div key={district.slug} className="space-y-2">
@@ -158,7 +157,6 @@ export default function HomePage() {
                         </Link>
                       </div>
 
-                      {/* 하위 동 버튼들 */}
                       <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pt-1">
                         {district.dongs.map((dong) => (
                           <Link
